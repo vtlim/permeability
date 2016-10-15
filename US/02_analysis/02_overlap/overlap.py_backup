@@ -1,0 +1,32 @@
+import os
+import numpy as np
+import matplotlib.pyplot as p
+
+data = []
+for i in range(53):
+    if i < 10:
+        index = "0"+str(i)
+    else:
+        index = str(i)
+    tfile = "win"+index+".traj"
+    print tfile
+
+    if not os.path.isfile(tfile):
+        continue
+
+    with open(tfile) as inf:
+        zlist = []
+        for line in inf:
+            parts = line.split() # split line into parts
+            if len(parts) > 1:   # if at least 2 parts/columns
+                zlist.append(float(parts[1]))   # print column 2
+    data.append(zlist)
+    
+print len(data)
+print len(zlist)
+
+data = zlist
+y,binEdges=np.histogram(data,bins=100)
+bincenters = 0.5*(binEdges[1:]+binEdges[:-1])
+p.plot(bincenters,y,'-')
+p.show()

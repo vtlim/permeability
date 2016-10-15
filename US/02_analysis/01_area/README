@@ -1,0 +1,12 @@
+Generate data file with:
+  awk 'BEGIN{i=1} $1 !~ /^#|^0/{print i,$2*$6,$10;i++}' ../../windows/*/input.xst > output.xst
+
+
+  1. Generate area (A^2) vs. time (x/50 ns) data file, see above.
+  2. Divide by 100 to get to nanometers squared
+  3. Divide by 50 lipids per leaflet (100 total)
+  4. Data > Trans > Hist, 0.6 0.9 100
+
+
+first full area/lipid histogram, including windows still running (9):
+3, 33, 42 / 44 45 47 48 / 50 52

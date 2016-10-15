@@ -1,0 +1,27 @@
+Colvarstrajfrequency    1000
+Colvarsrestartfrequency 1000
+
+colvar {
+    name ProjectionZ
+    width 0.1
+    lowerboundary -10.0
+    upperboundary  46.0
+    lowerwallconstant 10.0
+    upperwallconstant 10.0
+
+    distanceZ {
+        main  {
+            atomNumbers 41280 }
+        ref {
+            atomsFile /pub/limvt/pmf/00_reference/wtt.ref.pdb
+            atomsCol B
+            atomsColValue 2.0 }
+    }
+}
+
+harmonic {
+    name           Z
+    colvars        ProjectionZ
+    centers        CENTER
+    forceConstant  0.015          ;# 1.5 * 0.1^2 = 0.015
+}

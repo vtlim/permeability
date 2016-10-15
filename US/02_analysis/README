@@ -1,0 +1,8 @@
+
+Contents: scripts for analysis of US simulations in NAMD
+
+ * 01_area         Calculate area per lipid
+ * 02_overlap      Plot probability histograms of all windows together
+ * 03_wham         WHAM analysis to combine windows to PMF
+ * 04_mbar         MBAR analysis to combine windows to PMF
+ * getOutput.sh    Combine all *.traj files in central location
