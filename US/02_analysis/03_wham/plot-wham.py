@@ -13,19 +13,25 @@ from matplotlib.ticker import AutoMinorLocator
 
 # -------------------- Variables ------------------ #
 
-dataf=['US_0-4ns.pmf', 'US_4-8ns.pmf', 'US_8-12ns.pmf']
-os.chdir('/home/victoria/Documents/pmf/07_us/02_analysis/03_wham')
-#os.chdir('/pub/limvt/pmf/07_us/02_analysis/03_wham')
+#dataf=['US_0-10ns.pmf', 'US_4-8ns.pmf', 'US_8-12ns.pmf']
+#dataf=['US_0-13ns.pmf', 'US_13-26ns.pmf', 'US_26-39ns.pmf', 'US_39-52ns.pmf', 'US_52-104ns.pmf']
+dataf=['US_0-104ns.pmf']
 
+figname='pmf_all_mc10-noErr.png'
+plotErr = False
 # ------------------------------------------------- #
 
+#os.chdir('/home/victoria/Documents/pmf/07_us/02_analysis/03_wham')
+os.chdir('/pub/limvt/pmf/07_us/02_analysis/03_wham')
 
 origxs = []
 origys = []
+stdevs = []
 writeX = True # only write Xs for one file (all *should* be same)
 
 for i, f in enumerate(dataf):
     origys.append([])
+    stdevs.append([])
 
     ### open and read data
     indata = open(f, 'r')
@@ -43,22 +49,14 @@ for i, f in enumerate(dataf):
         ### add free energy data
         origys[i].append(float(line.split()[1])) 
 
+        ### add deviations from Monte Carlo bootstrap error analysis
+        stdevs[i].append(float(line.split()[2])) 
+
     writeX = False
 
 ### Convert x's from Angs --> nm.
 origxs = [0.1*i for i in origxs]
 
-#### Generate lists to plot both sides of symmetrized data
-#allx = np.zeros([2*len(symxs)-1], np.float64)  
-#ally = np.zeros([2*len(symys)-1], np.float64)
-#
-#for i in range(len(allx)):
-#    if i < len(symxs)-1:
-#        allx[i] = -1*symxs[len(symxs)-1-i]
-#        ally[i] = symys[len(symxs)-1-i]
-#    else:
-#        allx[i] = symxs[i-len(symxs)+1]
-#        ally[i] = symys[i-len(symxs)+1]
 
 # ===========================================
 #           PLOTTING
@@ -81,12 +79,16 @@ for ytick in ax1.get_yticklabels():
 # get legend labels
 lbls = []
 for f in dataf:
-    lbls.append(f.split('.')[0])
+    lbls.append(f.split('.')[0].split('_')[1])
 
 
 ### Plot the data.
-for color, y in zip(colors, origys):
-    ax1.plot(origxs, y, color=color)
+if plotErr:
+    for color, y, dev in zip(colors, origys, stdevs):
+        ax1.errorbar(origxs, y, yerr=dev, ecolor='k')
+else:
+    for color, y in zip(colors, origys):
+        ax1.plot(origxs, y, color=color)
 leg = ax1.legend(lbls,loc=1)
 
 # plot only one list
@@ -109,7 +111,7 @@ ax1.tick_params('both', length=10, width=1.5, which='major')
 ax1.tick_params('both', length=6, width=1, which='minor')
 
 ### Save and show.
-plt.savefig('us-pmf-3x.png',bbox_inches='tight')
+plt.savefig(figname,bbox_inches='tight')
 plt.show()
 
     
