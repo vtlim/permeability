@@ -4,21 +4,27 @@
 # Usage: python file.py
 
 import os
+import re
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from matplotlib.ticker import AutoMinorLocator
 
 nbins=180  # should match the nbins value from the MBAR script
-dataf=['umbrella-sampling-v5a.out','umbrella-sampling-v5b.out','umbrella-sampling-v5c.out']
+dataf=['pmf-2c_0-13.out','pmf-2d_13-26.out','pmf-2e_26-39.out','pmf-2f_39-52.out','pmf-2g_52-104.out']
+dataf=['pmf-2b-104ns.out']
+figname = 'plot-2b-withErr.png'
+plotErr = True
 os.chdir('/tw/limvt/04_mbar')
 
 origxs = []
 origys = []
+stdevs = []
 writeX = True # only write Xs for one file (all should be same)
 
 for i, f in enumerate(dataf):
     origys.append([])
+    stdevs.append([])
 
     ### open and read data
     indata = open(f, 'r')
@@ -34,12 +40,11 @@ for i, f in enumerate(dataf):
         ### add free energy data
         origys[i].append(float(line.split()[1])) 
 
+        ### add deviations
+        stdevs[i].append(float(line.split()[2]))
+
     writeX = False
 
-
-# ===========================================
-#           PLOTTING
-# ===========================================
 
 ### Initialize figure.
 fig = plt.figure()
@@ -57,16 +62,22 @@ for xtick in ax1.get_xticklabels():
 for ytick in ax1.get_yticklabels():
     ytick.set_fontsize(20)
 
-# get legend labels
-lbls = []
-for f in dataf:
-    lbls.append(f.split('.')[0])
-lbls = ['0-4 ns','4-8 ns','8-12 ns']
 
 ### Plot the data.
-for color, y in zip(colors, origys):
-    ax1.plot(origxs, y, color=color)
-leg = ax1.legend(lbls,loc=1)
+if plotErr:
+    for color, y, dev in zip(colors, origys, stdevs):
+        ax1.errorbar(origxs, y, yerr=dev, ecolor='k')
+else:
+    for color, y in zip(colors, origys):
+        ax1.plot(origxs, y, color=color)
+
+### get legend labels
+lbls = []
+for f in dataf:
+#    lbls.append(f.split('.')[0])
+    lbls.append(re.split('_|\.', f)[1]+' ns')
+#lbls = ['0-4 ns','4-8 ns','8-12 ns']
+#leg = ax1.legend(lbls,loc=1)
 
 # plot only one list
 #ax1.plot(origxs,origys[0])
@@ -88,5 +99,5 @@ ax1.tick_params('both', length=10, width=1.5, which='major')
 ax1.tick_params('both', length=6, width=1, which='minor')
 
 ### Save and show.
-plt.savefig('mbar-3x.png',bbox_inches='tight')
+plt.savefig(figname,bbox_inches='tight')
 plt.show()
