@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-# Purpose: Use MBAR to compute PMF from US simulation.
-#   The data represents an umbrella sampling simulation for the
-#   permeation of a tagged water molecule through a POPC lipid bilayer. 
+# Purpose: Use MBAR to compute PMF from NAMD US simulations.
 # Usage: python file.py > output.dat
 
 # Adapted from:
@@ -10,41 +8,80 @@
 
 
 import os
+import re
 import numpy # numerical array library
 import pymbar # multistate Bennett acceptance ratio
 from pymbar import timeseries # timeseries analysis
 import matplotlib.pyplot as plt
 
+# =========== VARIABLES ============================
 
-# Constants.
+### Parameters from US simulations
+
+K = 53          # number of windows
+z_min = -8.0  # min independent variable
+z_max = +44.0 # max independent variable
+temp = 308.     # temperature 
+
+nbins = 180     # number of bins for PMF (like nbins of histogram, more = finer data)
+N_max = 52001   # maximum number of snapshots/simulation
+#tstart = 0      # int start time (ns) for each window (assuming step*2/1e6 = time)
+#tstop = 26     # int stop time (ns) for each window
+
+os.chdir('/tw/limvt/04_mbar/')
+
+### specify tstart and tstop to read 
+portion = True
+if portion:
+    tstarts = numpy.ones(K,float)*39
+    tstops = numpy.ones(K,float)*52
+
+    for i in range(30,45,1):
+        tstarts[i] = 13
+        tstops[i] = 26
+    tstarts[5] = 52
+    tstarts[48] = 52
+    tstops[5] = 104
+    tstops[48] = 104
+
+### Constants.
 kB = 1.381e-23 * 6.022e23 / 1000.0 # Boltzmann constant in kJ/mol/K
-temperature = 308 # assume a single temperature -- can be overridden with data from center.dat 
-beta = 1.0 / (kB * temperature) # inverse temperature of simulations (in 1/(kJ/mol))
+beta = 1.0 / (kB * temp) # inverse temperature of simulations (in 1/(kJ/mol))
 
-# Parameters
-K = 53 # number of umbrellas
-N_max = 13001 # maximum number of snapshots/simulation
-chi_min = -8.0 # min for PMF
-chi_max = +44.0 # max for PMF
-nbins = 180 # number of bins for 1D PMF
-tstart = 0 # start time in ns for each window (assuming file has 1000 data pts per ns)
-tstop = 26 # stop time in ns for each window
 
-# Allocate storage for simulation data
-T_k = numpy.ones(K,float)*temperature # inital temperatures are all equal 
-N_k = numpy.zeros([K], numpy.int32) # N_k[k] is the number of snapshots from umbrella simulation k
-K_k = numpy.zeros([K], numpy.float64) # K_k[k] is the spring constant (in kJ/mol/Angs**2) for umbrella simulation k
-chi0_k = numpy.zeros([K], numpy.float64) # chi0_k[k] is the spring center location (in Angs) for umbrella simulation k
-chi_kn = numpy.zeros([K,N_max], numpy.float64) # chi_kn[k,n] is the transmembrane position (in Angs) for snapshot n from umbrella simulation k
-u_kn = numpy.zeros([K,N_max], numpy.float64) # u_kn[k,n] is the reduced potential energy without umbrella restraints of snapshot n of umbrella simulation k
-g_k = numpy.zeros([K],numpy.float32);
+# =========== FUNCTIONS ============================
 
-def parseData(lines, tstart=0, tstop=None):
-    if tstop == None:
-        tstop = len(lines)
 
+def parseWindow(filename, tstart=0, tstop=None):
+    """
+    For this window's data, get subset of data for specified start/end times.
+    Not called by main script, but called inside prepWindow.
+
+    Parameters
+    ----------
+    filename: string name of the file to process.
+       For *.traj file, assumes all lines are data (e.g. no comment lines).
+    tstart: integer nanosecond start time
+    tstop: integer nanosecond stop time 
+
+    Returns
+    -------
+    counts: int, number of entries for this particular window
+    winZ: numpy list containing data for this window from tstart to tstop
+
+    """
+
+    # Read file.
+    infile = open(filename, 'r')
+    lines = infile.readlines()
+    infile.close()
+
+    # Convert from time (ns) to step number.
     tstart = tstart/2*1000.
-    tstop = tstop/2*1000.+1
+    if tstop != None:
+        tstop = tstop/2*1000.+1
+    else:
+        tstop = len(lines)
 
     n = 0
     winZ = numpy.zeros([len(lines)])
@@ -54,16 +91,85 @@ def parseData(lines, tstart=0, tstop=None):
             continue
         if n>=tstop: 
             n += 1
-            continue
+            break
         if line[0] != '#' and line[0] != '@':
             tokens = line.split()
-            chi = float(tokens[1]) # transmemb position
-            winZ[n] = chi
+            winZ[n] = float(tokens[1]) # transmemb position
             n += 1
-    return tstop-tstart, winZ
+    counts = min(tstop-tstart, len(lines))
+    winZ = winZ[tstart:tstop]
+    return counts, winZ
 
-# Read in umbrella spring constants and centers. Format columns by (1) center, (2) spring const, (3) temp optional.
-os.chdir('/tw/limvt/04_mbar/')
+
+
+def prepWindow(filename, tstart=0, tstop=None):
+    """
+    Read window .traj file, compute correlation times, subsample data.
+
+    Parameters
+    ----------
+    filename: string name of the file to process.
+       For *.traj file, assumes all lines are data (e.g. no comment lines).
+    tstart: integer nanosecond start time
+    tstop: integer nanosecond stop time
+
+    Returns
+    -------
+    counts: int, number of entries for this particular window
+    winZ: numpy list containing SUBSAMPLED data for this window from tstart to tstop
+
+    """
+    # Parse data.
+    n, z_sub = parseWindow(filename, tstart, tstop)
+
+    # Compute correlation times for z (actual spring center position) timeseries.
+    g = timeseries.statisticalInefficiency(z_sub)
+    print "Correlation time for %s is %10.3f" % (re.split('\W+',filename)[1],g)
+    indices = timeseries.subsampleCorrelatedData(z_sub, g) 
+
+    # Subsample data.
+    zsublen = len(indices)
+    z_sub = z_sub[indices]
+    return zsublen, z_sub
+
+
+def plotPMF(xdata, ydata, devs, xlabel, ylabel, title, save=False, figname='plot.png'):
+    ### Initialize figure.
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111)
+    
+    ### Label the figure.
+    ax1.set_title(title,fontsize=20)
+    ax1.set_xlabel(xlabel,fontsize=18)
+    ax1.set_ylabel(ylabel,fontsize=19)
+    for xtick in ax1.get_xticklabels():
+        xtick.set_fontsize(14)
+    for ytick in ax1.get_yticklabels():
+        ytick.set_fontsize(14)
+    
+    ### Plot the data.
+    ax1.errorbar(xdata, ydata, yerr=devs, ecolor='k')
+    #ax1.plot(xdata, ydata)
+    if save: plt.savefig(figname)
+    plt.show()
+    
+# ==================================================
+# ==================================================
+
+
+### Allocate storage for simulation data
+T_k = numpy.ones(K,float)*temp # inital temperatures are all equal 
+N_k = numpy.zeros([K], numpy.int32) # N_k[k] is the number of snapshots from umbrella simulation k
+K_k = numpy.zeros([K], numpy.float64) # K_k[k] is the spring constant (in kJ/mol/Angs**2) for umbrella simulation k
+z0_k = numpy.zeros([K], numpy.float64) # z0_k[k] is the spring center location (in Angs) for umbrella simulation k
+z_kn = numpy.zeros([K,N_max], numpy.float64) # z_kn[k,n] is the transmembrane position (in Angs) for snapshot n from umbrella simulation k
+u_kn = numpy.zeros([K,N_max], numpy.float64) # u_kn[k,n] is the reduced potential energy without umbrella restraints of snapshot n of umbrella simulation k
+
+### beta factor for all temps. (See referenced code for diff. temp windows.)
+beta_k = 1.0/(kB*T_k)
+
+### Read in file containing US centers (column 1) and spring constants and (col 2). 
+### Units of centers being Angstrom, spring constant as kJ/mol/Angs**2 (convert from kcal/mol).
 infile = open('data/centers.dat', 'r')
 lines = infile.readlines()
 infile.close()
@@ -71,89 +177,71 @@ for k in range(K):
     # Parse line k.
     line = lines[k]
     tokens = line.split()
-    chi0_k[k] = float(tokens[0]) # spring center location (in Angs)
+    z0_k[k] = float(tokens[0]) # spring center (Angs)
     K_k[k] = float(tokens[1]) # spring constant (kJ/mol/Angs**2)    
-    if len(tokens) > 2:
-        T_k[k] = float(tokens[2])  # temperature the kth simulation was run at.
 
-# beta factor for all (same) temps. (Code relevant to diff. temp windows was taken out.)
-beta_k = 1.0/(kB*T_k)
 
-# Read the simulation data
+### Read/process simulation data for each window.
 for k in range(K):
-    # Read transmembrane position data.
-    filename = 'data/win%d.traj' % k
-    print "Reading %s..." % filename
-    infile = open(filename, 'r')
-    lines = infile.readlines()
-    infile.close()
 
-    # Parse data.
-    n, winZ = parseData(lines, tstart, tstop)
-    chi_kn[k] = winZ
+    # Get window number (e.g. 09)
+    if k < 10: kk = '0'+str(k)
+    else: kk = str(k)
+
+    filename = 'data/win%s.traj' % kk
+#    filename = 'data/26ns/win%d.traj' % k
+
+    n, winZ = prepWindow(filename, tstarts[k], tstops[k])
+
+    z_kn[k][0:len(winZ)] = winZ
     N_k[k] = n
 
-    # Compute correlation times for potential energy and chi timeseries. 
-    # If the temperatures differ, use energies to determine samples; otherwise, use the cosine of chi
-    chi_radians = chi_kn[k,tstart*1000:tstart*1000+N_k[k]]
-    g_cos = timeseries.statisticalInefficiency(numpy.cos(chi_radians))
-    g_sin = timeseries.statisticalInefficiency(numpy.sin(chi_radians))
-    print "g_cos = %.1f | g_sin = %.1f" % (g_cos, g_sin)
-    g_k[k] = max(g_cos, g_sin)
-    print "Correlation time for set %5d is %10.3f" % (k,g_k[k])
-    indices = timeseries.subsampleCorrelatedData(chi_radians, g=g_k[k]) 
-    indices = [tstart*1000+i for i in indices]
 
-    # Subsample data.
-    N_k[k] = len(indices)
-    u_kn[k,tstart*1000:tstart*1000+N_k[k]] = u_kn[k,indices]
-    chi_kn[k,tstart*1000:tstart*1000+N_k[k]] = chi_kn[k,indices]
-
+### Shorten list of counts per window (N) and the US center (z). Create list for PEs.
 N_max = numpy.max(N_k) # shorten the array size
-chi_kn = chi_kn[:,tstart*1000:tstart*1000+N_max]
 u_kln = numpy.zeros([K,K,N_max], numpy.float64) # u_kln[k,l,n] is the reduced potential energy of snapshot n from umbrella simulation k evaluated at umbrella l
 
-
-# Set zero of u_kn -- this is arbitrary.
+### Set zero of u_kn -- this is arbitrary.
+### At this point, is still zero since orig script only defined for DiffTemp = True ?
 u_kn -= u_kn.min()
 
-# Construct torsion bins
+
+### Bin the data.
 print "Binning data..."
-delta = (chi_max - chi_min) / float(nbins)
+
+# Construct torsion bins
+delta = (z_max - z_min) / float(nbins)
 
 # compute bin centers
 bin_center_i = numpy.zeros([nbins], numpy.float64)
 for i in range(nbins):
-    bin_center_i[i] = chi_min + delta/2 + delta * i
+    bin_center_i[i] = z_min + delta/2 + delta * i
 
-# Bin data
+# Compute bin assignment.
 bin_kn = numpy.zeros([K,N_max], numpy.int32)
 for k in range(K):
     for n in range(N_k[k]):
-        # Compute bin assignment.
-        bin_kn[k,n] = int((chi_kn[k,n] - chi_min) / delta)
+        bin_kn[k,n] = int((z_kn[k,n] - z_min) / delta)
 
-# Evaluate reduced energies in all umbrellas
+### Evaluate reduced energies in all umbrellas
 print "Evaluating reduced potential energies..."
 for k in range(K):
     for n in range(N_k[k]):
-        # Compute minimum-image torsion deviation from umbrella center l
-        dchi = chi_kn[k,n] - chi0_k
-        for l in range(K):
-            if (abs(dchi[l]) > 180.0):
-                dchi[l] = 360.0 - abs(dchi[l])
+        # Compute deviation from umbrella center
+        dz = z_kn[k,n] - z0_k
 
-        # Compute energy of snapshot n from simulation k in umbrella potential l
-        u_kln[k,:,n] = u_kn[k,n] + beta_k[k] * (K_k/2.0) * dchi**2
+        # Compute energy of snapshot n from simulation k in umbrella potential
+        u_kln[k,:,n] = u_kn[k,n] + beta_k[k] * (K_k/2.0) * dz**2
 
-# Initialize MBAR.
+### Initialize MBAR.
 print "Running MBAR..."
 mbar = pymbar.MBAR(u_kln, N_k, verbose = True, method = 'adaptive')
 
-# Compute PMF in unbiased potential (in units of kT).
+### Compute PMF in unbiased potential (in units of kT).
 (f_i, df_i) = mbar.computePMF(u_kn, bin_kn, nbins)
 
-# Write out PMF
+
+### Write out PMF.
 print "\n\nPMF (in units of Angs, kT)"
 print "%8s %8s %8s" % ('bin', 'f', 'df')
 for i in range(nbins):
@@ -162,32 +250,19 @@ for i in range(nbins):
 ### Convert units: x (A --> nm), y (kT --> kcal/mol).
 xs = [item/10 for item in bin_center_i]
 ys = [item*0.6120 for item in f_i]
+ss = [item*0.6120 for item in df_i]
 
-### Write out PMF
+
+### Write out PMF with converted units.
 print "\n\nPMF (in units of nm, kcal/mol)"
 print "%8s %8s" % ('bin', 'f')
 for i in range(nbins):
-    print "%8.6f %8.6f" % (xs[i], ys[i])
+    print "%8.6f %8.6f %8.6f" % (xs[i], ys[i], ss[i])
 
-# ===========================================
-#           PLOTTING
-# ===========================================
 
-### Initialize figure.
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
-
-### Label the figure.
-ax1.set_title('Potential of Mean Force of Water\nthrough POPC bilayer (0-13 ns)',fontsize=20)
-ax1.set_xlabel('z coordinate (nm)',fontsize=18)
-ax1.set_ylabel('free energy (kcal/mol)',fontsize=19)
-for xtick in ax1.get_xticklabels():
-    xtick.set_fontsize(14)
-for ytick in ax1.get_yticklabels():
-    ytick.set_fontsize(14)
-
-### Plot the data.
-ax1.plot(xs, ys)
-#plt.savefig('0-13ns.png')
-plt.show()
+### Plot the PMF.
+xlabel = 'z coordinate (nm)'
+ylabel = 'free energy (kcal/mol)'
+title = 'Potential of Mean Force of Water\nthrough POPC bilayer (0-52* ns)'
+#plotPMF(xs, ys, ss, xlabel, ylabel, title, save=True, figname='0-52ns.eps')
 
