@@ -1,0 +1,118 @@
+set num Wat
+#############################################################
+## JOB DESCRIPTION                                         ##
+#############################################################
+
+# US of WTT permeation. 
+# PME, Constant Presure.
+
+#############################################################
+## ADJUSTABLE PARAMETERS                                   ##
+#############################################################
+
+
+structure          ../waterbox.psf
+coordinates        ../waterbox.pdb
+outputName         us${num}-2
+
+set temperature    308
+
+# Continuing a job from the restart files
+set lastrun        ../run1/us${num}-1
+binCoordinates     $lastrun.coor
+binVelocities      $lastrun.vel  ;# remove the "temperature" entry if you use this!
+extendedSystem	   $lastrun.xsc
+
+firsttimestep      0
+
+
+#############################################################
+## SIMULATION PARAMETERS                                   ##
+#############################################################
+
+# Input
+paraTypeCharmm      on
+parameters          /pub/limvt/toppar/par_all36_lipid.prm
+parameters          /pub/limvt/toppar/toppar_water_ions.jaf.str
+
+# NOTE: Do not set the initial velocity temperature if you 
+# have also specified a .vel restart file!
+#temperature         $temperature
+ 
+
+# Periodic Boundary Conditions
+# NOTE: Do not set the periodic cell basis if you have also 
+# specified an .xsc restart file!
+#cellBasisVector1 60.404 0. 0.
+#cellBasisVector2 0. 58.281 0.
+#cellBasisVector3 0. 0. 116.458
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              9.0     ;# Cutoff designated by calculation C by Comer et al. 2014
+switching           on
+vdwForceSwitching   yes
+switchdist          8.0     ;# 1 A before cutoff
+pairlistdist        13.0    ;# set as 4 A above the cutoff
+margin              3.0
+
+# Integrator Parameters
+timestep            2.0     ;# fs/step
+rigidBonds          all
+nonbondedFreq       1
+fullElectFrequency  2
+stepspercycle       20
+
+#PME (for full-system periodic electrostatics)
+# values of 30, 32, 36, 40, 45, 48, 50, 54, 60, 64, 72, 75, 80, 81, 90, 96,  100, 120, 128
+PME                 yes
+PMEInterpOrder      6		;# interpolation order (spline order 6 in charmm)
+PMEGridSpacing	    1.0
+
+# Constant Temperature Control
+loweAndersen		on      ;# Use Lowe-Anderson Thermostat
+loweAndersenTemp	$temperature
+loweAndersenCutoff	2.7     ;# 0.27 nm cutoff 
+loweAndersenRate	50  	;# 50 ps^-1  Default values and indicated by Chipot
+zeroMomentum		yes 	;# Necessary for LA thermostat
+
+# Constant Pressure Control (variable volume)
+useGroupPressure      yes 	;# needed for 2fs steps
+useFlexibleCell       no 	;# no for water box, yes for membrane
+useConstantRatio      no	;# useConstantRatio requires useFlexibleCell
+
+langevinPiston        on
+langevinPistonTarget  1.01325 	;#  in bar -> 1 atm
+langevinPistonPeriod  200.0
+langevinPistonDecay   100.0
+langevinPistonTemp    $temperature
+
+
+restartfreq        10000   ;# 10000steps = every 20ps
+dcdfreq            10000
+xstFreq            10000   ;# every 1ps
+dcdUnitCell        yes;
+velDCDfile          usWat-2.veldcd
+velDCDfreq         50 ; # every 100 fs 
+outputEnergies     10000
+outputTiming       10000
+#outputPressure    500
+
+
+
+#############################################################
+## EXTRA PARAMETERS                                        ##
+#############################################################
+
+colvars	         on
+colvarsConfig    ../colvProd.tcl
+colvarsInput     ${lastrun}.restart.colvars.state ;# continue prev run
+
+
+#############################################################
+## EXECUTION SCRIPT                                        ##
+#############################################################
+
+#reinitvels $temperature
+run 1000000 ;# 2 ns
