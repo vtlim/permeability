@@ -1,0 +1,828 @@
+# Grace project file
+#
+@version 50125
+@page size 792, 612
+@description ""
+@page scroll 5%
+@page inout 5%
+@link page off
+@map font 8 to "Courier", "Courier"
+@map font 10 to "Courier-Bold", "Courier-Bold"
+@map font 11 to "Courier-BoldOblique", "Courier-BoldOblique"
+@map font 9 to "Courier-Oblique", "Courier-Oblique"
+@map font 4 to "Helvetica", "Helvetica"
+@map font 6 to "Helvetica-Bold", "Helvetica-Bold"
+@map font 7 to "Helvetica-BoldOblique", "Helvetica-BoldOblique"
+@map font 5 to "Helvetica-Oblique", "Helvetica-Oblique"
+@map font 14 to "NimbusMonoL-BoldOblique", "NimbusMonoL-BoldOblique"
+@map font 15 to "NimbusMonoL-Regular", "NimbusMonoL-Regular"
+@map font 16 to "NimbusMonoL-RegularOblique", "NimbusMonoL-RegularOblique"
+@map font 17 to "NimbusRomanNo9L-Medium", "NimbusRomanNo9L-Medium"
+@map font 18 to "NimbusRomanNo9L-MediumItalic", "NimbusRomanNo9L-MediumItalic"
+@map font 19 to "NimbusRomanNo9L-Regular", "NimbusRomanNo9L-Regular"
+@map font 20 to "NimbusRomanNo9L-RegularItalic", "NimbusRomanNo9L-RegularItalic"
+@map font 21 to "NimbusSansL-Bold", "NimbusSansL-Bold"
+@map font 22 to "NimbusSansL-BoldCondensed", "NimbusSansL-BoldCondensed"
+@map font 23 to "NimbusSansL-BoldCondensedItalic", "NimbusSansL-BoldCondensedItalic"
+@map font 24 to "NimbusSansL-BoldItalic", "NimbusSansL-BoldItalic"
+@map font 25 to "NimbusSansL-Regular", "NimbusSansL-Regular"
+@map font 26 to "NimbusSansL-RegularCondensed", "NimbusSansL-RegularCondensed"
+@map font 27 to "NimbusSansL-RegularCondensedItalic", "NimbusSansL-RegularCondensedItalic"
+@map font 28 to "NimbusSansL-RegularItalic", "NimbusSansL-RegularItalic"
+@map font 29 to "StandardSymbolsL-Regular", "StandardSymbolsL-Regular"
+@map font 12 to "Symbol", "Symbol"
+@map font 2 to "Times-Bold", "Times-Bold"
+@map font 3 to "Times-BoldItalic", "Times-BoldItalic"
+@map font 1 to "Times-Italic", "Times-Italic"
+@map font 0 to "Times-Roman", "Times-Roman"
+@map font 35 to "URWBookmanL-DemiBold", "URWBookmanL-DemiBold"
+@map font 36 to "URWBookmanL-DemiBoldItalic", "URWBookmanL-DemiBoldItalic"
+@map font 37 to "URWBookmanL-Light", "URWBookmanL-Light"
+@map font 38 to "URWBookmanL-LightItalic", "URWBookmanL-LightItalic"
+@map font 39 to "URWChanceryL-MediumItalic", "URWChanceryL-MediumItalic"
+@map font 40 to "URWGothicL-Book", "URWGothicL-Book"
+@map font 41 to "URWGothicL-BookOblique", "URWGothicL-BookOblique"
+@map font 42 to "URWGothicL-Demi", "URWGothicL-Demi"
+@map font 43 to "URWGothicL-DemiOblique", "URWGothicL-DemiOblique"
+@map font 44 to "URWPalladioL-Bold", "URWPalladioL-Bold"
+@map font 45 to "URWPalladioL-BoldItalic", "URWPalladioL-BoldItalic"
+@map font 46 to "URWPalladioL-Italic", "URWPalladioL-Italic"
+@map font 47 to "URWPalladioL-Roman", "URWPalladioL-Roman"
+@map font 13 to "ZapfDingbats", "ZapfDingbats"
+@map color 0 to (255, 255, 255), "white"
+@map color 1 to (0, 0, 0), "black"
+@map color 2 to (255, 0, 0), "red"
+@map color 3 to (0, 255, 0), "green"
+@map color 4 to (0, 0, 255), "blue"
+@map color 5 to (255, 255, 0), "yellow"
+@map color 6 to (188, 143, 143), "brown"
+@map color 7 to (220, 220, 220), "grey"
+@map color 8 to (148, 0, 211), "violet"
+@map color 9 to (0, 255, 255), "cyan"
+@map color 10 to (255, 0, 255), "magenta"
+@map color 11 to (255, 165, 0), "orange"
+@map color 12 to (114, 33, 188), "indigo"
+@map color 13 to (103, 7, 72), "maroon"
+@map color 14 to (64, 224, 208), "turquoise"
+@map color 15 to (0, 139, 0), "green4"
+@reference date 0
+@date wrap off
+@date wrap year 1950
+@default linewidth 1.0
+@default linestyle 1
+@default color 1
+@default pattern 1
+@default font 0
+@default char size 1.000000
+@default symbol size 1.000000
+@default sformat "%.8g"
+@background color 0
+@page background fill on
+@timestamp off
+@timestamp 0.03, 0.03
+@timestamp color 1
+@timestamp rot 0
+@timestamp font 0
+@timestamp char size 1.000000
+@timestamp def "Thu Jun 16 12:13:38 2016"
+@r0 off
+@link r0 to g0
+@r0 type above
+@r0 linestyle 1
+@r0 linewidth 1.0
+@r0 color 1
+@r0 line 0, 0, 0, 0
+@r1 off
+@link r1 to g0
+@r1 type above
+@r1 linestyle 1
+@r1 linewidth 1.0
+@r1 color 1
+@r1 line 0, 0, 0, 0
+@r2 off
+@link r2 to g0
+@r2 type above
+@r2 linestyle 1
+@r2 linewidth 1.0
+@r2 color 1
+@r2 line 0, 0, 0, 0
+@r3 off
+@link r3 to g0
+@r3 type above
+@r3 linestyle 1
+@r3 linewidth 1.0
+@r3 color 1
+@r3 line 0, 0, 0, 0
+@r4 off
+@link r4 to g0
+@r4 type above
+@r4 linestyle 1
+@r4 linewidth 1.0
+@r4 color 1
+@r4 line 0, 0, 0, 0
+@g0 on
+@g0 hidden false
+@g0 type XY
+@g0 stacked false
+@g0 bar hgap 0.000000
+@g0 fixedpoint off
+@g0 fixedpoint type 0
+@g0 fixedpoint xy 0.000000, 0.000000
+@g0 fixedpoint format general general
+@g0 fixedpoint prec 6, 6
+@with g0
+@    world 0, -70, 500, 70
+@    stack world 0, 0, 0, 0
+@    znorm 1
+@    view 0.150000, 0.150000, 1.150000, 0.850000
+@    title ""
+@    title font 0
+@    title size 1.500000
+@    title color 1
+@    subtitle ""
+@    subtitle font 0
+@    subtitle size 1.000000
+@    subtitle color 1
+@    xaxes scale Normal
+@    yaxes scale Normal
+@    xaxes invert off
+@    yaxes invert off
+@    xaxis  on
+@    xaxis  type zero false
+@    xaxis  offset 0.000000 , 0.000000
+@    xaxis  bar on
+@    xaxis  bar color 1
+@    xaxis  bar linestyle 1
+@    xaxis  bar linewidth 1.0
+@    xaxis  label "every 10th frame"
+@    xaxis  label layout para
+@    xaxis  label place auto
+@    xaxis  label char size 1.000000
+@    xaxis  label font 0
+@    xaxis  label color 1
+@    xaxis  label place normal
+@    xaxis  tick on
+@    xaxis  tick major 100
+@    xaxis  tick minor ticks 1
+@    xaxis  tick default 6
+@    xaxis  tick place rounded true
+@    xaxis  tick in
+@    xaxis  tick major size 1.000000
+@    xaxis  tick major color 1
+@    xaxis  tick major linewidth 1.0
+@    xaxis  tick major linestyle 1
+@    xaxis  tick major grid off
+@    xaxis  tick minor color 1
+@    xaxis  tick minor linewidth 1.0
+@    xaxis  tick minor linestyle 1
+@    xaxis  tick minor grid off
+@    xaxis  tick minor size 0.500000
+@    xaxis  ticklabel on
+@    xaxis  ticklabel format general
+@    xaxis  ticklabel prec 5
+@    xaxis  ticklabel formula ""
+@    xaxis  ticklabel append ""
+@    xaxis  ticklabel prepend ""
+@    xaxis  ticklabel angle 0
+@    xaxis  ticklabel skip 0
+@    xaxis  ticklabel stagger 0
+@    xaxis  ticklabel place normal
+@    xaxis  ticklabel offset auto
+@    xaxis  ticklabel offset 0.000000 , 0.010000
+@    xaxis  ticklabel start type auto
+@    xaxis  ticklabel start 0.000000
+@    xaxis  ticklabel stop type auto
+@    xaxis  ticklabel stop 0.000000
+@    xaxis  ticklabel char size 1.000000
+@    xaxis  ticklabel font 0
+@    xaxis  ticklabel color 1
+@    xaxis  tick place both
+@    xaxis  tick spec type none
+@    yaxis  on
+@    yaxis  type zero false
+@    yaxis  offset 0.000000 , 0.000000
+@    yaxis  bar on
+@    yaxis  bar color 1
+@    yaxis  bar linestyle 1
+@    yaxis  bar linewidth 1.0
+@    yaxis  label "z-position of WTT O wrt C21,C31 (A)"
+@    yaxis  label layout para
+@    yaxis  label place auto
+@    yaxis  label char size 1.000000
+@    yaxis  label font 0
+@    yaxis  label color 1
+@    yaxis  label place normal
+@    yaxis  tick on
+@    yaxis  tick major 20
+@    yaxis  tick minor ticks 1
+@    yaxis  tick default 6
+@    yaxis  tick place rounded true
+@    yaxis  tick in
+@    yaxis  tick major size 1.000000
+@    yaxis  tick major color 1
+@    yaxis  tick major linewidth 1.0
+@    yaxis  tick major linestyle 1
+@    yaxis  tick major grid off
+@    yaxis  tick minor color 1
+@    yaxis  tick minor linewidth 1.0
+@    yaxis  tick minor linestyle 1
+@    yaxis  tick minor grid off
+@    yaxis  tick minor size 0.500000
+@    yaxis  ticklabel on
+@    yaxis  ticklabel format general
+@    yaxis  ticklabel prec 5
+@    yaxis  ticklabel formula ""
+@    yaxis  ticklabel append ""
+@    yaxis  ticklabel prepend ""
+@    yaxis  ticklabel angle 0
+@    yaxis  ticklabel skip 0
+@    yaxis  ticklabel stagger 0
+@    yaxis  ticklabel place normal
+@    yaxis  ticklabel offset auto
+@    yaxis  ticklabel offset 0.000000 , 0.010000
+@    yaxis  ticklabel start type auto
+@    yaxis  ticklabel start 0.000000
+@    yaxis  ticklabel stop type auto
+@    yaxis  ticklabel stop 0.000000
+@    yaxis  ticklabel char size 1.000000
+@    yaxis  ticklabel font 0
+@    yaxis  ticklabel color 1
+@    yaxis  tick place both
+@    yaxis  tick spec type none
+@    altxaxis  off
+@    altyaxis  off
+@    legend on
+@    legend loctype view
+@    legend 0.85, 0.8
+@    legend box color 1
+@    legend box pattern 1
+@    legend box linewidth 1.0
+@    legend box linestyle 1
+@    legend box fill color 0
+@    legend box fill pattern 1
+@    legend font 0
+@    legend char size 1.000000
+@    legend color 1
+@    legend length 4
+@    legend vgap 1
+@    legend hgap 1
+@    legend invert false
+@    frame type 0
+@    frame linestyle 1
+@    frame linewidth 1.0
+@    frame color 1
+@    frame pattern 1
+@    frame background color 0
+@    frame background pattern 0
+@    s0 hidden false
+@    s0 type xy
+@    s0 symbol 1
+@    s0 symbol size 0.510000
+@    s0 symbol color 4
+@    s0 symbol pattern 1
+@    s0 symbol fill color 4
+@    s0 symbol fill pattern 0
+@    s0 symbol linewidth 1.0
+@    s0 symbol linestyle 1
+@    s0 symbol char 65
+@    s0 symbol char font 0
+@    s0 symbol skip 0
+@    s0 line type 0
+@    s0 line linestyle 1
+@    s0 line linewidth 1.0
+@    s0 line color 1
+@    s0 line pattern 1
+@    s0 baseline type 0
+@    s0 baseline off
+@    s0 dropline off
+@    s0 fill type 0
+@    s0 fill rule 0
+@    s0 fill color 1
+@    s0 fill pattern 1
+@    s0 avalue off
+@    s0 avalue type 2
+@    s0 avalue char size 1.000000
+@    s0 avalue font 0
+@    s0 avalue color 1
+@    s0 avalue rot 0
+@    s0 avalue format general
+@    s0 avalue prec 3
+@    s0 avalue prepend ""
+@    s0 avalue append ""
+@    s0 avalue offset 0.000000 , 0.000000
+@    s0 errorbar on
+@    s0 errorbar place both
+@    s0 errorbar color 4
+@    s0 errorbar pattern 1
+@    s0 errorbar size 1.000000
+@    s0 errorbar linewidth 1.0
+@    s0 errorbar linestyle 1
+@    s0 errorbar riser linewidth 1.0
+@    s0 errorbar riser linestyle 1
+@    s0 errorbar riser clip off
+@    s0 errorbar riser clip length 0.100000
+@    s0 comment "wtt.z.npt02.dat"
+@    s0 legend  ""
+@target G0.S0
+@type xy
+0 30.680359
+1 32.954494
+2 30.405062
+3 30.562414
+4 32.732937
+5 27.852634
+6 23.670965
+7 30.256884
+8 25.955956
+9 26.105698
+10 28.009222
+11 28.084957
+12 24.592545
+13 20.344816
+14 23.449865
+15 28.032589
+16 24.52672
+17 21.990463
+18 21.824873
+19 19.298775
+20 22.893335
+21 23.660412
+22 30.372114
+23 35.634441
+24 31.544996
+25 28.865992
+26 37.080704
+27 29.261005
+28 30.548702
+29 32.016693
+30 29.858576
+31 28.916538
+32 31.388025
+33 34.808907
+34 36.724964
+35 38.964542
+36 39.763802
+37 37.60709
+38 38.339352
+39 35.609356
+40 34.871704
+41 38.528931
+42 37.139862
+43 42.599888
+44 43.340446
+45 50.500637
+46 51.241711
+47 52.329369
+48 47.683372
+49 55.858673
+50 55.729099
+51 -60.772964
+52 56.080711
+53 58.406822
+54 -61.196529
+55 -55.152344
+56 -50.579475
+57 -49.0984
+58 -45.546558
+59 -45.169292
+60 -43.816982
+61 -45.386936
+62 -50.217018
+63 -54.1931
+64 -52.431351
+65 56.773403
+66 53.527111
+67 -61.471413
+68 54.560104
+69 54.33321
+70 45.346146
+71 45.577316
+72 45.078541
+73 45.020176
+74 57.921364
+75 59.508102
+76 -56.277466
+77 55.801144
+78 56.366356
+79 52.756645
+80 46.597775
+81 42.939465
+82 49.71769
+83 41.579544
+84 41.852272
+85 49.399223
+86 44.45578
+87 42.310947
+88 47.72921
+89 49.16053
+90 47.31192
+91 49.08667
+92 50.831097
+93 45.132545
+94 45.203392
+95 50.024632
+96 51.359806
+97 49.767849
+98 46.564491
+99 48.318665
+100 49.734142
+101 56.341759
+102 -61.628841
+103 57.317608
+104 -56.233208
+105 -45.515919
+106 -42.160927
+107 -50.093533
+108 -48.873001
+109 -48.812199
+110 -45.234016
+111 -51.743114
+112 -47.172863
+113 -59.86776
+114 -53.510132
+115 -52.725891
+116 -54.1189
+117 57.183445
+118 -57.007454
+119 58.216251
+120 -58.863716
+121 -49.614967
+122 -51.4058
+123 -53.838768
+124 -47.975613
+125 -57.595177
+126 -57.662659
+127 -56.61076
+128 59.217155
+129 57.61697
+130 60.210304
+131 -61.088234
+132 -61.859814
+133 53.634579
+134 52.746693
+135 57.425827
+136 -59.961666
+137 59.047024
+138 52.906445
+139 47.884121
+140 53.472679
+141 54.199387
+142 52.312485
+143 55.071056
+144 53.245598
+145 50.110939
+146 48.852661
+147 45.545307
+148 42.75436
+149 35.221825
+150 30.676601
+151 28.25919
+152 23.950153
+153 19.575588
+154 20.639338
+155 22.619545
+156 22.943874
+157 18.90847
+158 24.633417
+159 26.591829
+160 30.574038
+161 22.434875
+162 21.326725
+163 23.162493
+164 23.025484
+165 22.044853
+166 24.093626
+167 17.99119
+168 18.365383
+169 16.915091
+170 16.49367
+171 15.610828
+172 18.297428
+173 18.297125
+174 18.66584
+175 23.675068
+176 22.410704
+177 23.530018
+178 20.352467
+179 23.353668
+180 27.887629
+181 31.752815
+182 27.381338
+183 27.157331
+184 37.584385
+185 39.765011
+186 39.348686
+187 35.338322
+188 35.522358
+189 41.358624
+190 37.937408
+191 36.798824
+192 39.547016
+193 45.959034
+194 52.012009
+195 47.308475
+196 45.970684
+197 38.755379
+198 43.781128
+199 40.76535
+200 38.00296
+201 47.404148
+202 47.120743
+203 49.404015
+204 47.120087
+205 44.889042
+206 40.769012
+207 53.170418
+208 55.604588
+209 55.178497
+210 55.11507
+211 -59.844757
+212 -58.982258
+213 -58.571751
+214 -58.061176
+215 54.944656
+216 51.033329
+217 51.915516
+218 48.527611
+219 44.730682
+220 47.369858
+221 54.053501
+222 57.599403
+223 -53.446529
+224 -51.856007
+225 -48.955315
+226 -53.727524
+227 -56.228474
+228 -55.29668
+229 -54.089806
+230 -59.01088
+231 -45.92588
+232 -35.780128
+233 -35.288071
+234 -34.605148
+235 -37.566853
+236 -34.074036
+237 -34.461498
+238 -31.518246
+239 -30.516638
+240 -39.695045
+241 -43.834091
+242 -51.388214
+243 -43.964996
+244 -43.201241
+245 -49.256927
+246 -45.655361
+247 -34.010677
+248 -31.212605
+249 -42.051216
+250 -38.75753
+251 -38.698586
+252 -29.850826
+253 -27.964966
+254 -26.303888
+255 -24.670288
+256 -21.771002
+257 -22.854053
+258 -25.162539
+259 -31.932814
+260 -27.814219
+261 -30.592817
+262 -30.749947
+263 -40.954922
+264 -42.017536
+265 -46.503799
+266 -48.428753
+267 -50.133385
+268 -53.49659
+269 -53.398525
+270 -50.562576
+271 -55.218266
+272 -58.166172
+273 -57.529114
+274 53.204224
+275 50.599625
+276 48.027504
+277 42.069004
+278 41.373344
+279 44.736359
+280 40.395866
+281 45.010063
+282 44.721329
+283 48.847149
+284 50.676121
+285 -56.122971
+286 55.983501
+287 56.360554
+288 55.941772
+289 51.931713
+290 -57.709179
+291 -57.946033
+292 -52.983521
+293 -51.469555
+294 -47.272202
+295 -48.697037
+296 -43.345318
+297 -41.457539
+298 -44.168613
+299 -53.60791
+300 -46.421097
+301 -48.539818
+302 -47.332176
+303 -44.689526
+304 -47.010071
+305 -44.156452
+306 -36.913593
+307 -35.835358
+308 -47.853649
+309 -41.987484
+310 -42.676334
+311 -44.191185
+312 -41.139095
+313 -42.477448
+314 -37.263454
+315 -38.048092
+316 -40.066902
+317 -47.522968
+318 -50.257217
+319 -45.502625
+320 -47.224781
+321 -42.981735
+322 -48.400291
+323 -44.049427
+324 -42.37368
+325 -47.445049
+326 -56.45187
+327 -51.291813
+328 -51.814281
+329 -49.312359
+330 -60.160805
+331 -57.510738
+332 -51.421741
+333 -47.281483
+334 -56.48111
+335 -60.278416
+336 -59.24691
+337 -60.440819
+338 -58.631756
+339 -50.995644
+340 -47.096497
+341 -47.448856
+342 -43.643276
+343 -45.577942
+344 -50.336895
+345 -57.396656
+346 -47.310799
+347 -47.809296
+348 -50.726078
+349 -54.792099
+350 -47.53167
+351 -42.964878
+352 -36.328087
+353 -38.69632
+354 -35.910328
+355 -27.949154
+356 -24.565979
+357 -26.529356
+358 -21.115915
+359 -23.954342
+360 -23.534864
+361 -21.483885
+362 -22.141495
+363 -32.432213
+364 -36.588951
+365 -37.341965
+366 -40.627106
+367 -34.967152
+368 -31.228718
+369 -32.259579
+370 -34.886993
+371 -37.439854
+372 -35.859806
+373 -39.97406
+374 -45.544327
+375 -50.573181
+376 -47.357208
+377 -45.497074
+378 -46.777908
+379 -46.507256
+380 -41.924896
+381 -43.836491
+382 -45.833275
+383 -41.116455
+384 -54.232929
+385 -43.031227
+386 -45.551888
+387 -42.42794
+388 -44.19672
+389 -47.187622
+390 -50.509644
+391 -49.383564
+392 -53.47398
+393 -50.126198
+394 -50.05439
+395 -45.914825
+396 -47.695755
+397 -44.037899
+398 -42.085327
+399 -36.171543
+400 -31.888144
+401 -31.613827
+402 -32.667595
+403 -36.26672
+404 -35.992996
+405 -46.657089
+406 -40.882942
+407 -42.440887
+408 -42.417446
+409 -40.719692
+410 -41.967941
+411 -41.830574
+412 -41.527157
+413 -39.332829
+414 -37.521496
+415 -40.673695
+416 -38.449993
+417 -36.273491
+418 -43.37476
+419 -42.662815
+420 -36.348362
+421 -42.172977
+422 -47.543827
+423 -43.896282
+424 -44.760094
+425 -39.135094
+426 -41.063141
+427 -46.884953
+428 -38.282948
+429 -45.994244
+430 -55.398354
+431 -49.038155
+432 -48.03075
+433 -56.676212
+434 -55.109882
+435 -55.513493
+436 -50.534405
+437 -52.576012
+438 -52.070763
+439 -48.19352
+440 -56.665798
+441 54.609241
+442 49.861046
+443 46.800129
+444 49.836208
+445 48.019016
+446 48.470367
+447 50.445507
+448 45.345814
+449 38.990219
+450 26.922716
+451 23.670624
+452 29.474493
+453 34.997013
+454 31.980368
+455 31.924112
+456 24.324039
+457 27.593502
+458 22.639769
+459 21.32687
+460 21.004282
+461 20.896585
+462 24.154594
+463 25.636581
+464 29.524895
+465 28.014143
+466 27.486044
+467 30.915491
+468 39.533596
+469 39.555466
+470 33.418549
+471 40.096897
+472 33.552097
+473 29.047621
+474 34.06348
+475 39.307129
+476 38.889679
+477 46.975945
+478 46.577583
+479 44.080154
+480 53.283695
+481 -59.971283
+482 -58.924091
+483 -56.768631
+484 57.340679
+485 -53.278172
+486 -55.636181
+487 -45.616173
+488 -37.371292
+489 -36.131214
+490 -29.60112
+491 -33.552197
+492 -30.403925
+493 -25.131664
+494 -20.465456
+495 -20.693121
+496 -21.478432
+497 -19.704185
+498 -18.902323
+499 -19.480417
+&

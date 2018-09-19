@@ -1,0 +1,9 @@
+Grace files of probability density profiles. 20 June 2016
+Various versions of the histograms:
+
+altogether0.agr.....all sets divided by dh=0.2, numframes=10000
+altogether1.agr.....all sets also divided by total atoms=41282
+altogether2.agr.....each set multiplied by respective number atoms per group
+
+*dh was the bin width used in the Tcl script to generate the histogram
+

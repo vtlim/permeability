@@ -1,0 +1,35 @@
+==============================================================
+wdensC
+10000 configurations analyzed
+Selections:
+water
+protein
+phosphate
+carbonyl
+choline
+lipid
+glycerol
+Topology File:
+chipot_box.psf
+Data Files:
+../04_prod1/npt_01.dcd from 0 to -1
+../05_prod2/npt_02.dcd from 0 to -1
+Output Files:
+ndens_wtt_water.dat for water
+ndens_wtt_protein.dat for protein
+ndens_wtt_phosphate.dat for phosphate
+ndens_wtt_carbonyl.dat for carbonyl
+ndens_wtt_choline.dat for choline
+ndens_wtt_lipid.dat for lipid
+ndens_wtt_glycerol.dat for glycerol
+Data Directory:
+/pub/limvt/pmf/00_reference/
+Output Files Directory:
+/pub/limvt/pmf/analysis/02_ndens/
+Additional Parameters:
+histogram minium value: -65.0
+histogram maximum value: 65.0
+histogram bin width: 0.2
+origin was set to the COM of: carbonyl
+==============================================================
+
