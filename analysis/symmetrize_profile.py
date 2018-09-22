@@ -28,7 +28,7 @@ Notes:
 
 import os, sys
 import numpy as np
-
+from scipy import integrate
 
 
 def main(**kwargs):
@@ -38,6 +38,11 @@ def main(**kwargs):
     colvar_values = file_grad[:,0]
     length = len(colvar_values)
     grads =  file_grad[:,1]
+    try:
+        stds = file_grad[:,2]
+        with_err = True
+    except IndexError:
+        with_err = False
 
     if args.cfile is not None:
         file_count = np.loadtxt(args.cfile)
@@ -65,7 +70,6 @@ def main(**kwargs):
     print("# Number of data points: {}\n# Zero-based index of the zero-value colvar: {}".format(length, z0))
     print("# The {} hand side of the profile is longer by {} data points.".format(longer, longer_by))
     print("# Number of data points on longer edge: {}".format(longest_side_length))
-    longest_side_length -= 1 # subtract 1 for zero-based indexing
 
     ### Initiate indices for symmetrization
     sym_grads = np.zeros([longest_side_length], np.float64)   # anti-symm gradients
@@ -73,14 +77,16 @@ def main(**kwargs):
         neg_i = z0-1
         pos_i = z0+1
         loopstart = 1
+        loopend = longest_side_length
         sym_grads[0] = grads[z0]
     else:
         neg_i = z0
         pos_i = z0+1
         loopstart = 0
+        loopend = longest_side_length - 1
 
     ### loop from zero to max edge, symmetrizing
-    for i in range(loopstart, longest_side_length):
+    for i in range(loopstart, loopend):
 
         # handle cases that can't be symmetrized: (1) colvar=0, (2) no data on one side
         # zero case can be combined with one of others but written out for clarity
@@ -94,30 +100,57 @@ def main(**kwargs):
             else:
                 top_frac = counts[pos_i]*grads[pos_i] + counts[neg_i]*grads[neg_i]
             bot_frac = counts[pos_i] + counts[neg_i]
+            sym_grads[i] = top_frac / bot_frac
             #print(i, top_frac, bot_frac)
             #print(pos_i, counts[pos_i], grads[pos_i], counts[neg_i], grads[neg_i])
-            sym_grads[i] = top_frac / bot_frac
 
         neg_i -= 1
         pos_i += 1
 
-    ### Integrate the symmetrized gradients. Trapezoid rule.
-    # start from bulk water = 0. *-0.5 since going backwards.
-    # TODO use numpy functions for integrating
-    if args.anti:
-        int_pmf = np.zeros([longest_side_length], np.float64)   # anti-symm gradients
-        last = 0
-        for i in reversed(range(longest_side_length)):
-            int_pmf[i] = -0.5*0.1*(sym_grads[i]+sym_grads[i-1])+last
-            last = int_pmf[i]
-    else:
-        int_pmf = sym_grads
+    ### Propagate error values if present
+    ### TODO: this section is a bit redundant from the one above.
+    if with_err:
+        sym_stds = np.zeros([longest_side_length], np.float64)
+        if zero_present:
+            neg_i = z0-1
+            pos_i = z0+1
+            loopstart = 1
+            sym_stds[0] = stds[z0]
+        else:
+
+            neg_i = z0
+            pos_i = z0+1
+            loopstart = 0
+        for i in range(loopstart, loopend):
+            if neg_i < 0:
+                sym_stds[i] = stds[pos_i]
+            elif pos_i > len(colvar_values):
+                sym_stds[i] = stds[neg_i]
+            else:
+                sym_stds[i] = np.sqrt(np.square(stds[pos_i]) + np.square(stds[neg_i]))
+            neg_i -= 1
+            pos_i += 1
 
     ### Extract part of colvar array from zero-value-cv out to longest edge
     if longer == "right":
-        half_cvs = colvar_values[z0:-1] # 0 to 43.9
+        half_cvs = colvar_values[z0:] # 0 to 43.9
     else:
-        half_cvs = colvar_values[0:z0]  # untested
+        half_cvs = colvar_values[:z0]  # untested
+
+    ### Integrate the anti-symmetrized gradients. Trapezoid rule.
+    if args.anti:
+        if with_err:
+            sys.exit("ERROR: error propagation not yet supported for gradient data")
+        # reverse list before & after integration bc want zero reference at bulk water
+        # whole pmf gets shifted up by around the amount of barrier
+        int_pmf = integrate.cumtrapz(sym_grads[::-1], half_cvs[::-1])
+        int_pmf = int_pmf[::-1]
+        # now readjust half_cvs due to integration by taking midpoints
+        # https://tinyurl.com/ycahltpp
+        half_cvs = (half_cvs[1:] + half_cvs[:-1]) / 2
+        longest_side_length -= 1
+    else:
+        int_pmf = sym_grads
 
     ### Transform colvar unit from Angstroms to nanometers.
     cv_unit = "A"
@@ -126,8 +159,15 @@ def main(**kwargs):
 
     ### Generate the other half by mirroring
     ### TODO: around cv-zero is weird, either repeats 0.05 or -0.05 (no zero present)
-    full_cvs = np.zeros([2*longest_side_length-1], np.float64)
-    full_pmf = np.zeros([2*longest_side_length-1], np.float64)
+    if zero_present:
+        full_cvs = np.zeros([2*longest_side_length], np.float64)
+        full_pmf = np.zeros([2*longest_side_length], np.float64)
+        full_std = np.zeros([2*longest_side_length], np.float64)
+
+    else:
+        full_cvs = np.zeros([2*longest_side_length], np.float64)
+        full_pmf = np.zeros([2*longest_side_length], np.float64)
+        full_std = np.zeros([2*longest_side_length], np.float64)
     full_length = len(full_cvs)
 
     for i in range(full_length):
@@ -136,9 +176,11 @@ def main(**kwargs):
         elif i < longest_side_length: # negative value colvars
             full_cvs[i] = -1*half_cvs[longest_side_length-1-i]
             full_pmf[i] = int_pmf[longest_side_length-1-i]
+            if with_err: full_std[i] = sym_stds[longest_side_length-1-i]
         else:                       # positive value colvars
-            full_cvs[i] = half_cvs[i-longest_side_length+1]
-            full_pmf[i] = int_pmf[i-longest_side_length+1]
+            full_cvs[i] = half_cvs[i-longest_side_length]
+            full_pmf[i] = int_pmf[i-longest_side_length]
+            if with_err: full_std[i] = sym_stds[i-longest_side_length]
 
     if not zero_present:
         full_cvs = np.delete(full_cvs,longest_side_length-1)
@@ -148,7 +190,10 @@ def main(**kwargs):
     ### Write out symmetrized profile
     print("\n\n# Symmetrized profile (x units of {}, y units unchanged)".format(cv_unit))
     for i in range(full_length):
-        print("\t{} {}".format(full_cvs[i], full_pmf[i]))
+        if not with_err:
+            print("\t{} {}".format(full_cvs[i], full_pmf[i]))
+        else:
+            print("\t{} {} {}".format(full_cvs[i], full_pmf[i], full_std[i]))
 
 
 
@@ -157,18 +202,16 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--infile",
-                        help="Filename of ABF .grad suffix with information on"
-                             " the ABF estimate of the free energy gradient.")
+    parser.add_argument("-i", "--infile",required=True,
+                        help="Filename of data to be symmetrized.")
 
     parser.add_argument("-c", "--cfile",
-                        help="Filename of ABF .count suffix with information on"
-                             " total number of samples collected per grid point.")
+                        help="Filename of ABF .count suffix with total number"
+                             " of samples collected per grid point.")
 
     parser.add_argument("-a", "--anti", action="store_true", default=False,
-                        help="Anti-symmetrize the input (gradients) then integrate"
-                             " to get PMF.")
-
+                        help="Anti-symmetrize the input (gradient of pmf) then"
+                             " integrate to get PMF.")
 
     args = parser.parse_args()
     opt = vars(args)
