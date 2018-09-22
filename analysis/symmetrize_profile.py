@@ -158,16 +158,10 @@ def main(**kwargs):
 #    half_cvs = 0.1*half_cvs
 
     ### Generate the other half by mirroring
-    ### TODO: around cv-zero is weird, either repeats 0.05 or -0.05 (no zero present)
-    if zero_present:
-        full_cvs = np.zeros([2*longest_side_length], np.float64)
-        full_pmf = np.zeros([2*longest_side_length], np.float64)
-        full_std = np.zeros([2*longest_side_length], np.float64)
-
-    else:
-        full_cvs = np.zeros([2*longest_side_length], np.float64)
-        full_pmf = np.zeros([2*longest_side_length], np.float64)
-        full_std = np.zeros([2*longest_side_length], np.float64)
+    ### TODO: around cv-zero is weird, may repeat a z-value
+    full_cvs = np.zeros([2*longest_side_length], np.float64)
+    full_pmf = np.zeros([2*longest_side_length], np.float64)
+    full_std = np.zeros([2*longest_side_length], np.float64)
     full_length = len(full_cvs)
 
     for i in range(full_length):
