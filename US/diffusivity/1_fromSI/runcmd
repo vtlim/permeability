@@ -1,0 +1,5 @@
+./all.sh
+grep nm2/ns diffuse_26ns.out > diffuse_26ns.dat
+vim -s cleandiffuse.vim diffuse_26ns.dat
+
+
