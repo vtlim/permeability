@@ -1,16 +1,12 @@
 /**
- * compile by g++ name.cpp -o executableName 
+ * compile by g++ name.cpp -o executableName
  * usage is ./correlation trajfile fieldnumber
  *
- * This script reads in one NAMD *.traj file and calculates the autocorrelation function and diffusion coefficient. For umbrella sampling simulations.
- * More explanation on usage: 
- *    'correlation' is the name of the executable C++ file
- *    'trajfile' is NAMD *.traj file
- *    'fieldnumber' is optional parameter specifying column to read from trajfile. 
- *        E.g. Column 0 is timestep, column (field) 1 is position. Default is 1.
- * 
- * REFERENCE
- * Lee, C. T.; Comer, J.; Herndon, C.; Leung, N.; Pavlova, A.; Swift, R. V.; Tung, C.; Rowley, C. N.; Amaro, R. E.; Chipot, C.; Wang, Y.; Gumbart, J. C.Simulation-Based Approaches for Determining Membrane Permeability of Small Compounds J. Chem. Inf. Model. 2016, 56, 721– 733, DOI: 10.1021/acs.jcim.6b00022
+ * Purpose: Compute autocorrelation functions and diffusivity from NAMD .traj files.
+ * This code is from the supporting information of the reference listed below.
+ * Documentation added by Victoria Lim.
+ *
+ * Reference DOI: 10.1021/acs.jcim.6b00022
 
 */
 
@@ -32,29 +28,29 @@ using namespace std;
 
     @param y Timeseries data as vector of doubles. Already subtracted average.
     @param nSamples Number of samples in this timeseries vector.
-    @param nCorr                     ???? nsamples in summation of eq 5 ?????
+    @param nCorr Maximum number of correlated samples to consider? TODO
     @return autocorrelation function as a vector of doubles.
 
 */
 double *calcCorrelation(double *y, int nSamples, int nCorr)
 {
-    double *corr=new double[nCorr];  // correlation as a function of lag time
+    double *corr=new double[nCorr]; // allocate space for correlation fx
     int *norm=new int[nCorr];
     int min;
     int t;
     int ttoMax;
 
-    // set initial zero values for all the lag times
+    // set initial correlation values as zeroes for all lag times
     for(int i=0;i<nCorr;++i) {
         corr[i]=0.0;
         norm[i]=0;
     }
 
-    // each value of timeseries is used as reference (the i in eq. 5)
+    // loop through each value of timeseries (the i in eq. 5)
     for(int i=0;i<nSamples;++i) {
 
-        // set upper limit of summation for eq. 5
-        // use whichever is smaller, nSamples or i+nCorr
+        // set upper limit of summation in eq. 5
+        // limit is set as minimum of nSamples or i+nCorr
         ttoMax=nSamples;
         if(i+nCorr<nSamples) ttoMax=i+nCorr;
 
@@ -66,7 +62,7 @@ double *calcCorrelation(double *y, int nSamples, int nCorr)
         }
     }
 
-    // for each of the Czz(t) values, divide by counts (n_samples in eq 5)
+    // normalize each term in C_zz(t) bc diff lag times will have diff number of terms summed
     for(int i=0;i<nCorr;++i) {
         corr[i]=corr[i]/norm[i];
     }
@@ -77,7 +73,7 @@ double *calcCorrelation(double *y, int nSamples, int nCorr)
 
 
 /**
-    Calculate variance of the timeseries. 
+    Calculate variance of the timeseries.
     Variance is the sum of squared differences (x - <x>), divided by N-1.
     The differences should already have been taken. Here, square, add, divide.
 
@@ -92,7 +88,7 @@ double variance(double *y, int nSamples)
     for(int i=0;i<nSamples;++i)
     v2+=y[i]*y[i];
     // cout << "variance << " << v2 << endl;
-    v2/=nSamples; // ???????????????/ N-1 ??????????????
+    v2/=nSamples;
     return(v2);
 }
 
@@ -101,7 +97,7 @@ double variance(double *y, int nSamples)
     the average subtracted from each component.
                 dz(t) = z(t) - <z>
 
-    @param y Timeseries data as vector of doubles. 
+    @param y Timeseries data as vector of doubles.
     @param nSamples Number of samples in this timeseries vector.
 
 */
@@ -196,9 +192,9 @@ vector<double> readSeries(char *fname, int &numSamples, int field)
     numSamples=0;
     while(getline(datafile,line))
     {
-    //  cout << line << endl;
+    // cout << line << endl;
 
-        // skip lines starting with '#'
+        // skip lines starting with #
         if(line.at(0)!='#')
     {
         // get relevant data starting at char begin, 23 chars long
@@ -216,36 +212,34 @@ vector<double> readSeries(char *fname, int &numSamples, int field)
 
 int main(int argc, char *argv[])
 {
-//    int nCorr=10000; // ?????????????????????????? nSamples / 2
-    int nCorr=6000; // ?????????????????????????? nSamples / 2
+    int nCorr=10000; // max number of correlated samples to consider? (TODO)
     vector<double> series;
     double *acf, *timeSeries;
     double var, I;
     char *fname;
-    double timestep=2.0;
+    double timestep=2.0; // units of femtoseconds
     int field=1;
     int numSamples;
 
     // if the number of arguments len(argv) is 0, then quit
     if(argc<1)
         return(1);
-    
+
     // get trajfile name from argument 1
     fname=argv[1];
-    
     // get field number from arg 2 and convert to integer
-    if(argc>1)    
+    if(argc>1)
         field=atoi(argv[2]);
-        //  int numSamples=countLines(fname)-1;
-    
+        // int numSamples=countLines(fname)-1;
+
     // get vector of timeseries data
     series=readSeries(fname, numSamples, field);
     timeSeries=&series[0];
-    
+
     // fix numSamples since readSeries increments one at the end
     numSamples=numSamples-1;
 
-    // transform timeSeries by subtracting avg from each component    
+    // transform timeSeries by subtracting avg from each component
     subtract_average(timeSeries, numSamples);
 
     // calculate autocorrelation function (vector as fx of lag times)
@@ -254,7 +248,7 @@ int main(int argc, char *argv[])
     // get value of variance.
     var=variance(timeSeries, numSamples);
 
-    // get double value of integrated ACF 
+    // get double value of integrated ACF
     I=integrateCorr(acf, nCorr, timestep);
 
     // print statistics
@@ -264,6 +258,7 @@ int main(int argc, char *argv[])
     // take var^2 to calculate diffusion coefficient and print
     cout << "D = " << var*var/I << " A2/fs " << endl;
     cout << "D = " << var*var/I*0.1 << " cm2/s " << endl;
+    cout << "D = " << var*var/I*10000. << " nm2/ns " << endl; // added by VTL
 
     // print the acf
     for(int i=0;i<10;++i)
@@ -271,7 +266,6 @@ int main(int argc, char *argv[])
 
     // clean up
     delete[] acf;
-//    for( int i = 0 ; i < series.size(); i++)
-//       delete series[i];
-//       series.clear();
+    // series.earse();
 }
+
