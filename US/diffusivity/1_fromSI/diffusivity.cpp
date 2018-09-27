@@ -1,5 +1,5 @@
 /**
- * compile by g++ name.cpp -o executableName
+ * compile by g++ name.cpp -o correlation
  * usage is ./correlation trajfile fieldnumber
  *
  * Purpose: Compute autocorrelation functions and diffusivity from NAMD .traj files.
