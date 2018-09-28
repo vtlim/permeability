@@ -47,8 +47,7 @@ Checking these files will only take a few minutes compared to the hours/days the
 
 Note: A separate colvars configuration file does not need to be applied for treatment of fullSamples.   
 The number of samples for `fullSamples` is saved and read from restart files, so when starting from   
-a simulation with sufficient sampling, the bias is applied immediately.  
-[q&a from namd mailing list](https://tinyurl.com/ya2qlttm)
+a simulation with sufficient sampling, the bias is applied immediately. [see q&a from namd mailing list](https://tinyurl.com/ya2qlttm)
 
 
 ## Output of locateWTT.tcl script generating pdbs to start ABF windows.
@@ -68,8 +67,7 @@ Win	| Bounds	| PDB from traj		| Frame		| Distance WTT to center    | Date genera
 
 ## Analysis specific to ABF calculations
 
-Original cell dimensions in `PDB: 51.313   68.416  116.890`  
-Examples for the grad files of three runs but can input more if wanted.  
+Examples use the grad files of three runs but can take less/more than three.  
 Directory organized like: `project/win01/analysis/check_convergence`  
 
 * Check convergence: `tclsh abfConvergence.tcl ../../08_run8/abf.win01.08.grad 30 1 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad output`
