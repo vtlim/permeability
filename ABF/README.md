@@ -66,3 +66,16 @@ Win	| Bounds	| PDB from traj		| Frame		| Distance WTT to center    | Date genera
 06	| [-8,4]	| abf.win05.01.dcd	| 14980		| 2.450698971748352		    | Wed Oct 19 11:40:39 PDT 2016
 
 
+## Analysis specific to ABF calculations
+
+Original cell dimensions in `PDB: 51.313   68.416  116.890`  
+Examples for the grad files of three runs but can input more if wanted.  
+Directory organized like: `project/win01/analysis/check_convergence`  
+
+* Check convergence: `tclsh abfConvergence.tcl ../../08_run8/abf.win01.08.grad 30 1 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad output`
+  * where 30 should be replaced with time between hist frames, with units of ??? [TODO]
+  * where 1 can be changed for desired stride
+
+* Calculate statistical uncertainty of PMF: `tclsh abfCheckRunsError.tcl 32 32 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad  output`
+
+

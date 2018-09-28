@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+# Last edited/tested: October 2016
+# Victoria Lim
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,33 +11,22 @@ import matplotlib as mpl
 
 # ============ Parameters ===================
 
-win = 'win05-noMin'
+win = 'win04-constRatio'
 
-filename = "xst1_win05_2-8.dat"
+filename = "xst1_win04_1-3.dat"
+figname = "plot_cell_win04.png"
+
 delimiter = " "
 numCols = 3 # first n (non-time) data columns
 #cols = [1,3] # first and 3 data columns
+
 xlabel = "time (ns)"
 ylabel = "dimension ($\AA$)"
 plttitle = "PBC box size: %s" % (win.split('-')[0])
 leglabel = ["X","Y","Z"]
-figname = "plot_cell.png" 
 
-
-#filename = "hv1+gbi_contacts.dat"
-#delimiter = "  "
-#numCols = 5
-#xlabel = "time (ns)"
-#ylabel = "Distance ($\AA$)"
-#plttitle = "Hv1 Contacts with 2GBI, pose %s" % pose
-#leglabel = ["F150-benzo","R211-guan","D112-imid","S181-imid","R211-imid"]
-#figname = "plot_contacts.png"
 
 # ===========================================
-
-
-
-os.chdir('/pub/limvt/pmf/06_abf/%s/analysis/' % (win))
 
 with open(filename) as f:
     data = f.read()
@@ -60,7 +52,7 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 
 ### Label the figure.
-ax1.set_title(plttitle,fontsize=20) 
+ax1.set_title(plttitle,fontsize=20)
 ax1.set_xlabel(xlabel,fontsize=18)
 ax1.set_ylabel(ylabel,fontsize=18)
 for xtick in ax1.get_xticklabels():
