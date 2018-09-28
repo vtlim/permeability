@@ -1,48 +1,54 @@
 
 # ABF simulations to calculate membrane permeability
 
-Last edited:     Sep 19 2018  
-Test system:     TIP3P water molecule through a POPC bilayer  
+Last edited:     Sep 28 2018   
+Test system:     TIP3P water molecule through a POPC bilayer   
 
-Water permeability in POPC is 136e-4 cm/s. [TODO add reference]  
-Comer got 60-80e-4 cm/s.
+Water permeability in POPC is 136e-4 cm/s.  
+Comer got 60-80e-4 cm/s.  
+See references in Comer paper in the main README file of this repository.  
 
-## Procedure [TODO]
+## Procedure
 
-1. 
+1. Equilibrate system.
 
-2. 
+2. Prepare starting coordinates (pdb files) for windows.
+   - From steered MD?
+   - From neighboring windows?
 
-3. 
+3. Run ABF calculations.
+
+4. Evaluate convergence, using .grad files.
+
+5. Stitch together PMF from the different windows.
+
+6. Calculate diffusivity using .traj files with DiffusionFusion.
+
 
 ### Things to change and check upon starting new continuation runs of a window
 Checking these files will only take a few minutes compared to the hours/days these simulations will take to run.
 
-1. Job submission file
+1. NAMD configuration file
+    *. Copy namd configuration file to new file.
+    1. Define new `outputName`.
+    2. Specify the restart file names (coor, vel, xsc).
+    3. Set `firsttimestep` if desired.
+    4. [if cont from run1] Comment temperature.
+    5. [if cont from run1] Comment cellBasisVector(3), cellOrigin.
+    6. [if cont from run1] Specify colvars restart file for `colvarsInput`.
+    7. [if cont from run1] Comment `minimize` and `reinitvels`
+    8. Change `run` amount if need be.
+
+2. Job submission file
     1. job name
     2. input file name
     3. output file name
 
-2. NAMD configuration file
-    1. Rename file from base name (`run01.inp`)
-    2. coordinates line
-    3. outputname line
-    4. lastrun block; and don't forget to include directory with filename
-    5. firsttimestep
-    6. colvarsConfig
-    7. colvarsInput
 
-
-### General parameters that a restart run has and differs from initial run in NAMD
-
-1. Write new output name
-2. Write input of previous run
-3. Comment out temperature
-4. Uncomment binCoordinates, binVelocities, extendedSystem
-5. Comment cellBasisVector(3), cellOrigin
-6. Set firsttimestep if desired
-7. Comment minimize, reinitvels
-8. Change "run" amount if needed
+Note: A separate colvars configuration file does not need to be applied for treatment of fullSamples.   
+The number of samples for `fullSamples` is saved and read from restart files, so when starting from   
+a simulation with sufficient sampling, the bias is applied immediately.  
+[q&a from namd mailing list](https://tinyurl.com/ya2qlttm)
 
 
 ## Output of locateWTT.tcl script generating pdbs to start ABF windows.
