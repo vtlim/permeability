@@ -8,6 +8,7 @@ membrane permeabilities via three approaches: (1) umbrella sampling, (2) adaptiv
 References:
 1. [Calculation of Lipid-Bilayer Permeabilities Using an Average Force](http://pubs.acs.org/doi/pdf/10.1021/ct400925s)
 2. [Simulation-Based Approaches for Determining Membrane Permeability of Small Compounds](http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.6b00022)
+3. [NAMD user guide for version 2.13b1](https://www.ks.uiuc.edu/Research/namd/2.13b1/ug.pdf)
 
 -------------------------------------------------------------------------------------------------------
 
