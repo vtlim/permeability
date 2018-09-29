@@ -11,3 +11,6 @@ US/02_analysis/03_wham/archive/**
 abfCheckRunsError.tcl
 abfConvergence.tcl
 
+# test data
+analysis/permeability/examples/calc_perme/source/**
+
