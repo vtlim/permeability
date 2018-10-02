@@ -1,7 +1,7 @@
 
 # ABF simulations to calculate membrane permeability
 
-Last edited:     Sep 28 2018   
+Last edited:     Oct 1 2018   
 Test system:     TIP3P water molecule through a POPC bilayer   
 
 Water permeability in POPC is 136e-4 cm/s.  
@@ -17,12 +17,20 @@ See references in Comer paper in the main README file of this repository.
    - From neighboring windows?
 
 3. Run ABF calculations.
+    a. The simulations obtain N number of samples per bin before applying the biasing force.  
+       This isn't a separate calculation but is specified by the `fullSamples` parameter.
+    b. Run and extend each window as necessary, periodically checking *convergence* of `.hist.grad` files
+    c. Extend each window with `updateBias` off. (vtl did not run)  
+       This wasn't done in the referenced paper bc wasn't introduced until later (subdiffusion paper?)
 
-4. Evaluate convergence, using .grad files.
+4. Stitch together PMF from the different windows.
+    a. Generate symbolic links for every window's last .count and .grad files in your working directory.
+    b. Prepare namd input file. No MD steps are run, but it's just to call namd.
+    c. Prepare colvars input file. Specify the files from step (a) for the `inputPrefix` line.  
+       Note that the namd user guide says the grid definition (min, max, width) can be changed.  
+    d. Run the namd job: `namd merge.inp > merge.out`
 
-5. Stitch together PMF from the different windows.
-
-6. Calculate diffusivity using .traj files with DiffusionFusion.
+5. Calculate diffusivity using .traj files with DiffusionFusion.
 
 
 ### Things to change and check upon starting new continuation runs of a window
@@ -70,9 +78,10 @@ Win	| Bounds	| PDB from traj		| Frame		| Distance WTT to center    | Date genera
 Examples use the grad files of three runs but can take less/more than three.  
 Directory organized like: `project/win01/analysis/check_convergence`  
 
-* Check convergence: `tclsh abfConvergence.tcl ../../08_run8/abf.win01.08.grad 30 1 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad output`
-  * where 30 should be replaced with time between hist frames, with units of ??? [TODO]
-  * where 1 can be changed for desired stride
+* Check convergence by evaluating RMSD of the gradients with respect to the last frame
+  * `tclsh abfConvergence.tcl reference_not_hist.grad delTime stride file1.hist.grad file2.hist.grad file3.hist.grad`
+  * `delTime` is the actual time between frames in the `.hist` files. For example, with 2 fs time step and 1000 for `Colvarstrajfrequency` the `delTime` would be 0.002 (ns).
+  * `stride` is for taking every Nth frame of the `.hist.grad` files
 
 * Calculate statistical uncertainty of PMF: `tclsh abfCheckRunsError.tcl 32 32 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad  output`
 
