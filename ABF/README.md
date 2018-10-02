@@ -17,18 +17,18 @@ See references in Comer paper in the main README file of this repository.
    - From neighboring windows?
 
 3. Run ABF calculations.
-    a. The simulations obtain N number of samples per bin before applying the biasing force.  
+    1. The simulations obtain N number of samples per bin before applying the biasing force.  
        This isn't a separate calculation but is specified by the `fullSamples` parameter.
-    b. Run and extend each window as necessary, periodically checking *convergence* of `.hist.grad` files
-    c. Extend each window with `updateBias` off. (vtl did not run)  
+    2. Run and extend each window as necessary, periodically checking *convergence* of `.hist.grad` files
+    3. Extend each window with `updateBias` off. (vtl did not run)  
        This wasn't done in the referenced paper bc wasn't introduced until later (subdiffusion paper?)
 
 4. Stitch together PMF from the different windows.
-    a. Generate symbolic links for every window's last .count and .grad files in your working directory.
-    b. Prepare namd input file. No MD steps are run, but it's just to call namd.
-    c. Prepare colvars input file. Specify the files from step (a) for the `inputPrefix` line.  
+    1. Generate symbolic links for every window's last .count and .grad files in your working directory.
+    2. Prepare namd input file. No MD steps are run, but it's just to call namd.
+    3. Prepare colvars input file. Specify the files from step (a) for the `inputPrefix` line.  
        Note that the namd user guide says the grid definition (min, max, width) can be changed.  
-    d. Run the namd job: `namd merge.inp > merge.out`
+    4. Run the namd job: `namd merge.inp > merge.out`
 
 5. Calculate diffusivity using .traj files with DiffusionFusion.
 
@@ -36,7 +36,7 @@ See references in Comer paper in the main README file of this repository.
 ### Things to change and check upon starting new continuation runs of a window
 Checking these files will only take a few minutes compared to the hours/days these simulations will take to run.
 
-1. NAMD configuration file
+1. NAMD configuration file  
     *. Copy namd configuration file to new file.
     1. Define new `outputName`.
     2. Specify the restart file names (coor, vel, xsc).
@@ -83,6 +83,7 @@ Directory organized like: `project/win01/analysis/check_convergence`
   * `delTime` is the actual time between frames in the `.hist` files. For example, with 2 fs time step and 1000 for `Colvarstrajfrequency` the `delTime` would be 0.002 (ns).
   * `stride` is for taking every Nth frame of the `.hist.grad` files
 
-* Calculate statistical uncertainty of PMF: `tclsh abfCheckRunsError.tcl 32 32 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad  output`
+* Calculate statistical uncertainty of PMF:
+  * `tclsh abfCheckRunsError.tcl 32 32 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad  output`
 
 
