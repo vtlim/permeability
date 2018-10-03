@@ -12,50 +12,20 @@ Assumes:
 - The first x-value should be INSIDE the range of file2 x-values.
 
 TODO:
-- add argument parsing
 - read in third file if desired
+- save as non-CSV format
 
 """
 
 import numpy as np
-
-
-infile1 = "source/water_1.csv"
-infile2 = "source/water_2.csv"
-reffile = infile1
-# TODO check that reference file is one of the input files
-
-data1 = np.genfromtxt(infile1, delimiter=',')
-data2 = np.genfromtxt(infile2, delimiter=',')
-x1 = data1[:,0]
-x2 = data2[:,0]
-y1 = data1[:,1]
-y2 = data2[:,1]
-
-# assign which is reference and which is other
-refx = x1
-otrx = x2
-refy = y1
-otry = y2
-if reffile == infile2:
-    refx = x2
-    otrx = x1
-    refy = y2
-    otry = y1
-
-print("The reference file has {} x-values, and the other file has {} x-values.".format(len(refx),len(otrx)))
-
-
-
+import os
+import sys
 
 
 def find_nearest(array, value):
     """
+    Returns the index of "array" whose data best matches "value".
     https://tinyurl.com/yc7twjx8
-
-    Returns five indices for matching values from "array" to "value",
-    sorted from best match to worst match.
-
     """
     array = np.asarray(array)
     idxs = np.argsort(np.abs(array - value))[0]
@@ -84,7 +54,7 @@ def find_matches(refx, otrx, verbose=False):
     # get the indices that were reported more than once
     dups = list_duplicates(otr_inds_to_keep)
 
-    #
+    # for each of the duplicates, find which entry to keep and which to discard
     for d in dups:
         locs = list(i for i,value in enumerate(otr_inds_to_keep) if value == d)
         vals = [refx[i] for i in locs]
@@ -100,30 +70,82 @@ def find_matches(refx, otrx, verbose=False):
 
 
 
-otr_inds_to_keep = find_matches(refx,otrx)
-leftover = otr_inds_to_keep.count(None)
-print("Found {} matches. {} x-values of file1 unmatched.".format(len(otr_inds_to_keep),leftover))
+def main(**kwargs):
 
-# get indices of none, and remove from original refx
-nones = list(i for i,value in enumerate(otr_inds_to_keep) if value is None)
-newrefx = [i for j,i in enumerate(refx) if j not in nones]
-newrefy = [i for j,i in enumerate(refy) if j not in nones]
-otr_inds_to_keep = [i for j,i in enumerate(otr_inds_to_keep) if j not in nones]
+    # load data from files
+    data1 = np.genfromtxt(args.infile1, delimiter=',')
+    data2 = np.genfromtxt(args.infile2, delimiter=',')
+    x1 = data1[:,0]
+    x2 = data2[:,0]
+    y1 = data1[:,1]
+    y2 = data2[:,1]
 
-# get the values of the matching otrx
-newotrx = [otrx[i] for i in otr_inds_to_keep]
-newotry = [otry[i] for i in otr_inds_to_keep]
+    # check that reference file is one of the input files
+    if args.reffile not in [args.infile1, args.infile2]:
+        sys.exit("ERROR: reference file must be either file1 or file2")
 
-# average the newrefx and newotrx to get roughly unified x values
-unifyx = np.average(np.array([newrefx,newotrx]), axis=0)
+    # assign which is reference file and which is other file
+    refx = x1
+    otrx = x2
+    refy = y1
+    otry = y2
+    if args.reffile == args.infile2:
+        refx = x2
+        otrx = x1
+        refy = y2
+        otry = y1
+    print("\nThe reference file has {} x-values, and the other file has {} x-values.".format(len(refx),len(otrx)))
 
-# save files of matched data points
-np.savetxt("source/water_1_short.csv", np.c_[newrefx,newrefy], delimiter=",", fmt='%f')
-np.savetxt("source/water_2_short.csv", np.c_[newotrx,newotry], delimiter=",", fmt='%f')
+    # find the best matches between the two files
+    otr_inds_to_keep = find_matches(refx,otrx)
+    leftover = otr_inds_to_keep.count(None)
 
-# save files with unified xs and convert xs from nm --> Angstrom
-# convert diffusivity ys from nm2/ns --> Angstrom2/ns
-np.savetxt("source/water_1_samex_angstrom.csv", np.c_[np.asarray(unifyx)*10.,newrefy], delimiter=",", fmt='%f')
-np.savetxt("source/water_2_samex_angstrom.csv", np.c_[np.asarray(unifyx)*10.,np.asarray(newotry)*100.], delimiter=",", fmt='%f')
+    # get indices of none, and remove from original refx
+    nones = list(i for i,value in enumerate(otr_inds_to_keep) if value is None)
+    newrefx = [i for j,i in enumerate(refx) if j not in nones]
+    newrefy = [i for j,i in enumerate(refy) if j not in nones]
+    otr_inds_to_keep = [i for j,i in enumerate(otr_inds_to_keep) if j not in nones]
+    print("Found {} matches. {} x-values from reference file unmatched.".format(len(otr_inds_to_keep),leftover))
 
+    # get the values of the matching otrx
+    newotrx = [otrx[i] for i in otr_inds_to_keep]
+    newotry = [otry[i] for i in otr_inds_to_keep]
+
+    # quick assessment of the final matched values
+    diffx = np.array(newrefx)-np.array(newotrx)
+    print("The greatest deviation of match is {:.5f}.\nIf this is too large on the scale "
+          "of your data, this script may not be applicable.\n".format(np.amax(diffx)))
+
+    # average the newrefx and newotrx to get roughly unified x values
+    unifyx = np.average(np.array([newrefx,newotrx]), axis=0)
+
+    # save files of matched data points
+    np.savetxt(os.path.splitext(args.infile1)[0]+"_short.csv", np.c_[newrefx,newrefy], delimiter=",", fmt='%f')
+    np.savetxt(os.path.splitext(args.infile2)[0]+"_short.csv", np.c_[newotrx,newotry], delimiter=",", fmt='%f')
+
+    # save files with unified xs and convert xs from nm --> Angstrom
+    # convert diffusivity ys from nm2/ns --> Angstrom2/ns
+    np.savetxt(os.path.splitext(args.infile1)[0]+"_samex_angstrom.csv", np.c_[np.asarray(unifyx)*10.,newrefy], delimiter=",", fmt='%f')
+    np.savetxt(os.path.splitext(args.infile2)[0]+"_samex_angstrom.csv", np.c_[np.asarray(unifyx)*10.,np.asarray(newotry)*100.], delimiter=",", fmt='%f')
+
+
+
+if __name__ == "__main__":
+
+    import argparse
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-i", "--infile1", required=True,
+                        help="Data set 1")
+
+    parser.add_argument("-j", "--infile2", required=True,
+                        help="Data set 2")
+
+    parser.add_argument("-r", "--reffile", required=True,
+                        help="Which of the input files to use as reference")
+
+
+    args = parser.parse_args()
+    opt = vars(args)
+    main(**opt)
 
