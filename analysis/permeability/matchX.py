@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 """
+By:      Victoria T. Lim
+Version: Oct 03 2018
+
 Usage:   python matchX.py -i file1.in -j file2.in -r file1.in
 
 Purpose: Match two sets of XY data based on most similar X-values.
@@ -30,6 +33,7 @@ def find_nearest(array, value):
     array = np.asarray(array)
     idxs = np.argsort(np.abs(array - value))[0]
     return idxs
+
 
 def list_duplicates(seq):
     """
@@ -67,7 +71,6 @@ def find_matches(refx, otrx, verbose=False):
                 otr_inds_to_keep[l] = None
 
     return otr_inds_to_keep
-
 
 
 def main(**kwargs):
@@ -129,7 +132,6 @@ def main(**kwargs):
     np.savetxt(os.path.splitext(args.infile2)[0]+"_samex_angstrom.csv", np.c_[np.asarray(unifyx)*10.,np.asarray(newotry)*100.], delimiter=",", fmt='%f')
 
 
-
 if __name__ == "__main__":
 
     import argparse
@@ -143,7 +145,6 @@ if __name__ == "__main__":
 
     parser.add_argument("-r", "--reffile", required=True,
                         help="Which of the input files to use as reference")
-
 
     args = parser.parse_args()
     opt = vars(args)
