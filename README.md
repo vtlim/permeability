@@ -32,7 +32,8 @@ References:
 ```
 
 ## TODO
-4. argument parsing for `matchX.py`
-1. update ABF inputs/scripts
-2. update US inputs/scripts
-3. add meta-eABF inputs/scripts
+1. argument parsing for `matchX.py`
+2. update ABF inputs/scripts
+3. update US inputs/scripts
+4. add meta-eABF inputs/scripts
+
