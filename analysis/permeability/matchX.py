@@ -9,6 +9,7 @@ Usage:   python matchX.py -i file1.in -j file2.in -r file1.in
 Purpose: Match two sets of XY data based on most similar X-values.
          This can be used for when data comes from different sources,
          but there needs to be a 1:1 correspondence for further calculations.
+
 Assumes:
 - No repeated x in either dataset.
 - Data sets are sorted by x-value.
