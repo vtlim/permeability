@@ -86,4 +86,11 @@ Directory organized like: `project/win01/analysis/check_convergence`
 * Calculate statistical uncertainty of PMF:
   * `tclsh abfCheckRunsError.tcl 32 32 ../../01_run1/abf.win01.01.grad ../../02_run2/abf.win01.02.grad ../../03_run3/abf.win01.03.grad  output`
 
+* Prep files for combining PMF of separate windows
+  * `for k in {01..06}; do echo $k; ln -s /pub/limvt/pmf/06_abf/win$k-constRatio/06*/abf.win$k.06.count .; done`
+  * `for k in {01..06}; do echo $k; ln -s /pub/limvt/pmf/06_abf/win$k-constRatio/06*/abf.win$k.06.grad  .; done`
+
+* Run NAMD to combine PMF:
+  * `module load NAMD-multicore/2.9; namd2 merge_.inp > merge.out`
+
 
