@@ -141,11 +141,8 @@ def main(**kwargs):
     if args.anti:
         if with_err:
             sys.exit("ERROR: error propagation not yet supported for gradient data")
-        # reverse list before & after integration bc want zero reference at bulk water
-        # whole pmf gets shifted up by around the amount of barrier
-        int_pmf = integrate.cumtrapz(sym_grads[::-1], half_cvs[::-1])
-        int_pmf = int_pmf[::-1]
-        # now readjust half_cvs due to integration by taking midpoints
+        int_pmf = integrate.cumtrapz(sym_grads, half_cvs)
+        # take midpoint of all adjacent data points in half_cvs due to integration
         # https://tinyurl.com/ycahltpp
         half_cvs = (half_cvs[1:] + half_cvs[:-1]) / 2
         longest_side_length -= 1
