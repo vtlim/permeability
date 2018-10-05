@@ -33,7 +33,7 @@ from scipy import integrate
 
 def main(**kwargs):
 
-    ### Load data and check that they have the same colvar grid.
+    # load data and check that they have the same colvar grid.
     file_grad  = np.loadtxt(args.infile)
     colvar_values = file_grad[:,0]
     length = len(colvar_values)
@@ -53,14 +53,14 @@ def main(**kwargs):
     else:
         counts = np.ones(length)
 
-    ### Find index where colvar changes sign (symmetrize around this point)
-    ### z0 is where colvar=0 if present, else will be the negative colvar closest to 0
+    # find index where colvar changes sign (symmetrize around this point)
+    # z0 is where colvar=0 if present, else will be the negative colvar closest to 0
     zero_present = False
     z0 = np.where(colvar_values <= 0)[0][-1]
     if colvar_values[z0] == 0:
         zero_present = True
 
-    ### get the length of data points on the longest side
+    # get the length of data points on the longest side
     longest_side_length = max(z0, length-z0)
     longer = "right"
     if longest_side_length == z0:
@@ -71,7 +71,7 @@ def main(**kwargs):
     print("# The {} hand side of the profile is longer by {} data points.".format(longer, longer_by))
     print("# Number of data points on longer edge: {}".format(longest_side_length))
 
-    ### Initiate indices for symmetrization
+    # initiate indices for symmetrization
     sym_grads = np.zeros([longest_side_length], np.float64)   # anti-symm gradients
     if zero_present:
         neg_i = z0-1
@@ -85,7 +85,7 @@ def main(**kwargs):
         loopstart = 0
         loopend = longest_side_length - 1
 
-    ### loop from zero to max edge, symmetrizing
+    # loop from zero to max edge, symmetrizing
     for i in range(loopstart, loopend):
 
         # handle cases that can't be symmetrized: (1) colvar=0, (2) no data on one side
@@ -107,7 +107,7 @@ def main(**kwargs):
         neg_i -= 1
         pos_i += 1
 
-    ### Propagate error values if present
+    # propagate error values if present
     ### TODO: this section is a bit redundant from the one above.
     if with_err:
         sym_stds = np.zeros([longest_side_length], np.float64)
@@ -131,13 +131,13 @@ def main(**kwargs):
             neg_i -= 1
             pos_i += 1
 
-    ### Extract part of colvar array from zero-value-cv out to longest edge
+    # extract part of colvar array from zero-value-cv out to longest edge
     if longer == "right":
         half_cvs = colvar_values[z0:] # 0 to 43.9
     else:
         half_cvs = colvar_values[:z0]  # untested
 
-    ### Integrate the anti-symmetrized gradients. Trapezoid rule.
+    # integrate the anti-symmetrized gradients. Trapezoid rule.
     if args.anti:
         if with_err:
             sys.exit("ERROR: error propagation not yet supported for gradient data")
@@ -149,13 +149,12 @@ def main(**kwargs):
     else:
         int_pmf = sym_grads
 
-    ### Transform colvar unit from Angstroms to nanometers.
+    # transform colvar unit from Angstroms to nanometers.
     cv_unit = "A"
 #    cv_unit = "nm"
 #    half_cvs = 0.1*half_cvs
 
-    ### Generate the other half by mirroring
-    ### TODO: around cv-zero is weird, may repeat a z-value
+    # generate the other half by mirroring
     full_cvs = np.zeros([2*longest_side_length], np.float64)
     full_pmf = np.zeros([2*longest_side_length], np.float64)
     full_std = np.zeros([2*longest_side_length], np.float64)
@@ -167,18 +166,23 @@ def main(**kwargs):
         elif i < longest_side_length: # negative value colvars
             full_cvs[i] = -1*half_cvs[longest_side_length-1-i]
             full_pmf[i] = int_pmf[longest_side_length-1-i]
-            if with_err: full_std[i] = sym_stds[longest_side_length-1-i]
-        else:                       # positive value colvars
+            if with_err:
+                full_std[i] = sym_stds[longest_side_length-1-i]
+        else:                         # positive value colvars
             full_cvs[i] = half_cvs[i-longest_side_length]
             full_pmf[i] = int_pmf[i-longest_side_length]
-            if with_err: full_std[i] = sym_stds[i-longest_side_length]
+            if with_err:
+                full_std[i] = sym_stds[i-longest_side_length]
 
-    if not zero_present:
-        full_cvs = np.delete(full_cvs,longest_side_length-1)
-        full_pmf = np.delete(full_pmf,longest_side_length-1)
-        full_length = len(full_cvs)
+    # if there is no zero-value colvars, remove the extraneous (-)0.0 value
+    # TODO since [only tested for when RHS is longer]
+    full_cvs = np.delete(full_cvs,longest_side_length-1)
+    full_pmf = np.delete(full_pmf,longest_side_length-1)
+    if with_err:
+        full_std = np.delete(full_std,longest_side_length-1)
+    full_length = len(full_cvs)
 
-    ### Write out symmetrized profile
+    # write out symmetrized profile
     print("\n\n# Symmetrized profile (x units of {}, y units unchanged)".format(cv_unit))
     for i in range(full_length):
         if not with_err:
