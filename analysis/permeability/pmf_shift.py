@@ -4,7 +4,7 @@
 By:      Victoria T. Lim
 Version: Oct 03 2018
 
-Usage:   python shift_pmf.py -i pmf-sym.dat -a 32.0 -b 34.0 -o pmf-sym-shift.dat
+Usage:   python pmf_shift.py -i pmf-sym.dat -a 40.0 -b 42.0 -o pmf-sym-shift.dat
 
 Purpose: Shift the potential of mean force input data. Do this by calculating
          the mean between two provided x-values, and defining this as zero point.
