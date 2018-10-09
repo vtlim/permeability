@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Usage: python symmetrize_profile.py -i profile.in [-c weights.dat] [--anti] > profile.out
+Usage: python symmetrize_profile.py -i profile.in [-c weights.dat] [--anti] -o output
 
 Purpose: Symmetrize given data (e.g., diffusivity, PMF) across x-value of zero.
          Takes into account weighted averages, if weights (counts of data at
@@ -66,10 +66,6 @@ def main(**kwargs):
     if longest_side_length == z0:
         longer = "left"
     longer_by = longest_side_length-z0
-    print("# Input profile: {}\n# Input .count file: {}".format(args.infile, args.cfile))
-    print("# Number of data points: {}\n# Zero-based index of the zero-value colvar: {}".format(length, z0))
-    print("# The {} hand side of the profile is longer by {} data points.".format(longer, longer_by))
-    print("# Number of data points on longer edge: {}".format(longest_side_length))
 
     # initiate indices for symmetrization
     sym_grads = np.zeros([longest_side_length], np.float64)   # anti-symm gradients
@@ -183,12 +179,17 @@ def main(**kwargs):
     full_length = len(full_cvs)
 
     # write out symmetrized profile
-    print("\n\n# Symmetrized profile (x units of {}, y units unchanged)".format(cv_unit))
-    for i in range(full_length):
-        if not with_err:
-            print("\t{} {}".format(full_cvs[i], full_pmf[i]))
-        else:
-            print("\t{} {} {}".format(full_cvs[i], full_pmf[i], full_std[i]))
+    with open(args.outfile,'w') as f:
+        f.write("# Input profile: {}\n# Input .count file: {}".format(args.infile, args.cfile))
+        f.write("\n# Number of data points: {}\n# Zero-based index of the zero-value colvar: {}".format(length, z0))
+        f.write("\n# The {} hand side of the profile is longer by {} data points.".format(longer, longer_by))
+        f.write("\n# Number of data points on longer edge: {}".format(longest_side_length))
+        f.write("\n\n\n# Symmetrized profile (x units of {}, y units unchanged)".format(cv_unit))
+        for i in range(full_length):
+            if not with_err:
+                f.write("\n\t{} {}".format(full_cvs[i], full_pmf[i]))
+            else:
+                f.write("\n\t{} {} {}".format(full_cvs[i], full_pmf[i], full_std[i]))
 
 
 
@@ -197,7 +198,7 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--infile",required=True,
+    parser.add_argument("-i", "--infile", required=True,
                         help="Filename of data to be symmetrized.")
 
     parser.add_argument("-c", "--cfile",
@@ -208,7 +209,12 @@ if __name__ == "__main__":
                         help="Anti-symmetrize the input (gradient of pmf) then"
                              " integrate to get PMF.")
 
+    parser.add_argument("-o", "--outfile", required=True,
+                        help="Name of the output file.")
+
     args = parser.parse_args()
     opt = vars(args)
+    if os.path.exists(args.outfile):
+        sys.exit("ERROR: output file already exists")
     main(**opt)
 
