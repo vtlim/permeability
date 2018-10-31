@@ -14,15 +14,15 @@ Formula: For some profile D(x), weights N(x), and grid point xi:
                                 N(xi) + N(-xi)
 
 By:         Victoria T. Lim
-Version:    Sep 20 2018
+Version:    Oct 31 2018
 Reference:  10.1021/ct400925s
 
 Notes:
 - colvar = collective variable, referring to x-value
 - If your input data is the GRADIENT of the PMF, such as from adaptive biasing
   force, make sure to include the --anti flag. This changes the numerator of
-  the above formula to [N(xi)*D(xi) - N(-xi)*D(-xi)], because you need to use
-  antisymmetrize(grad(PMF)) in order to get symmetrize(PMF) after integration.
+  the above formula to [N(xi)*D(xi) - N(-xi)*D(-xi)], because you need to
+  ANTIsymmetrize(grad(PMF)) in order to get symmetrized(PMF) after integration.
 
 """
 
@@ -32,6 +32,42 @@ from scipy import integrate
 
 
 def main(**kwargs):
+
+    def initiate_indices(longest_side_length, z0, zero_present):
+        """
+        Define start and end range for looping through to (anti)symmetrize
+        input data. The idea is to start from the profile's zero-value,
+        and work out to the end of the profile. This function takes into
+        account that the zero-value may not be at the beginning, middle,
+        or end of the input data.
+
+        Parameters
+        ----------
+        longest_side_length : int
+            Number of items from zero-value to end of profile.
+        z0 : int
+            The index for the zero-value in the input data.
+        zero_present : Bool
+            Is the z0 value the actual center, or is it a skewed
+            center? E.g. if input data has ..., -0.10, -0.05, 0.05, 0.10, ...
+            True for actual zero value, False otherwise.
+
+        Returns
+        -------
+
+        """
+        sym_array = np.zeros([longest_side_length], np.float64)
+        if zero_present:
+            neg_i = z0-1
+            pos_i = z0+1
+            loopstart = 1
+            loopend = longest_side_length
+        else:
+            neg_i = z0
+            pos_i = z0+1
+            loopstart = 0
+            loopend = longest_side_length - 1
+        return sym_array, neg_i, pos_i, loopstart, loopend
 
     # load data and check that they have the same colvar grid.
     file_grad  = np.loadtxt(args.infile)
@@ -68,18 +104,9 @@ def main(**kwargs):
     longer_by = longest_side_length-z0
 
     # initiate indices for symmetrization
-    sym_grads = np.zeros([longest_side_length], np.float64)   # anti-symm gradients
+    sym_grads, neg_i, pos_i, loopstart, loopend = initiate_indices(longest_side_length, z0, zero_present)
     if zero_present:
-        neg_i = z0-1
-        pos_i = z0+1
-        loopstart = 1
-        loopend = longest_side_length
         sym_grads[0] = grads[z0]
-    else:
-        neg_i = z0
-        pos_i = z0+1
-        loopstart = 0
-        loopend = longest_side_length - 1
 
     # loop from zero to max edge, symmetrizing
     for i in range(loopstart, loopend):
@@ -92,31 +119,23 @@ def main(**kwargs):
             sym_grads[i] = grads[neg_i]
         else:
             if args.anti:
+                # based on eq. on p.558 of reference
                 top_frac = counts[pos_i]*grads[pos_i] - counts[neg_i]*grads[neg_i]
             else:
                 top_frac = counts[pos_i]*grads[pos_i] + counts[neg_i]*grads[neg_i]
             bot_frac = counts[pos_i] + counts[neg_i]
             sym_grads[i] = top_frac / bot_frac
-            #print(i, top_frac, bot_frac)
-            #print(pos_i, counts[pos_i], grads[pos_i], counts[neg_i], grads[neg_i])
 
         neg_i -= 1
         pos_i += 1
 
+
     # propagate error values if present
     ### TODO: this section is a bit redundant from the one above.
     if with_err:
-        sym_stds = np.zeros([longest_side_length], np.float64)
+        sym_stds, neg_i, pos_i, loopstart, loopend = initiate_indices(longest_side_length, z0, zero_present)
         if zero_present:
-            neg_i = z0-1
-            pos_i = z0+1
-            loopstart = 1
             sym_stds[0] = stds[z0]
-        else:
-
-            neg_i = z0
-            pos_i = z0+1
-            loopstart = 0
         for i in range(loopstart, loopend):
             if neg_i < 0:
                 sym_stds[i] = stds[pos_i]
@@ -133,17 +152,32 @@ def main(**kwargs):
     else:
         half_cvs = colvar_values[:z0]  # untested
 
-    # integrate the anti-symmetrized gradients. Trapezoid rule.
+    # integrate the anti-symmetrized gradients
     if args.anti:
+
+        # write out the counts-weighted and ANTI-symmetrized gradients.
+        # gradients written out here bc the full gradient is never computed.
+        # pmf is computed from what grad data is avail, then is symmetrized.
+        gfile = os.path.splitext(args.outfile)[0]+'.grad'
+        with open(gfile,'w') as f:
+            f.write("# Input profile: {}\n# Input .count file: {}".format(args.infile, args.cfile))
+            f.write("\n\n# Anti-symmetrized profile\n")
+            np.savetxt(f, np.c_[half_cvs,sym_grads], delimiter='\t', fmt=['%.2f','%.6f'])
+
         if with_err:
             sys.exit("ERROR: error propagation not yet supported for gradient data")
+
+        # trapezoid rule for integration
         int_pmf = integrate.cumtrapz(sym_grads, half_cvs)
+
         # take midpoint of all adjacent data points in half_cvs due to integration
         # https://tinyurl.com/ycahltpp
         half_cvs = (half_cvs[1:] + half_cvs[:-1]) / 2
         longest_side_length -= 1
+
     else:
         int_pmf = sym_grads
+
 
     # transform colvar unit from Angstroms to nanometers.
     cv_unit = "A"
@@ -184,12 +218,13 @@ def main(**kwargs):
         f.write("\n# Number of data points: {}\n# Zero-based index of the zero-value colvar: {}".format(length, z0))
         f.write("\n# The {} hand side of the profile is longer by {} data points.".format(longer, longer_by))
         f.write("\n# Number of data points on longer edge: {}".format(longest_side_length))
-        f.write("\n\n\n# Symmetrized profile (x units of {}, y units unchanged)".format(cv_unit))
-        for i in range(full_length):
-            if not with_err:
-                f.write("\n\t{} {}".format(full_cvs[i], full_pmf[i]))
-            else:
-                f.write("\n\t{} {} {}".format(full_cvs[i], full_pmf[i], full_std[i]))
+        f.write("\n\n\n# Symmetrized profile (x units of {}, y units unchanged)\n".format(cv_unit))
+        if not with_err:
+            #f.write("\n\t{} {}".format(full_cvs[i], full_pmf[i]))
+            np.savetxt(f, np.c_[full_cvs,full_pmf], delimiter='\t', fmt=['%.2f','%.15f'])
+        else:
+            #f.write("\n\t{} {} {}".format(full_cvs[i], full_pmf[i], full_std[i]))
+            np.savetxt(f, np.c_[full_cvs,full_pmf,full_std], delimiter='\t', fmt=['%.2f','%.15f','%.15f'])
 
 
 
