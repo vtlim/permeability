@@ -1,26 +1,16 @@
-# README.md
-Original cell dimensions in `PDB: 51.313   68.416  116.890`
 
-## Checking equilibration from box size
+# Scripts for evaluating box size in MD simulation
+Last updated: Dec 3 2018
 
-1. Awk-process NAMD xst files to obtain cell area and height.
-   * `awk 'BEGIN{i=1} $1 !~ /^#|^0/{print i,$2*$6,$10;i++}' file1.xst [file2.xst] > output.xst`
-   * `./xst.sh` for automating and working with multiple input/output files
+## Contents
+* `area_box_lipid.py`
 
-2. View with xmgrace.
-   * `xmgrace -nxy output.xst &`
+## Example instructions
 
-3. Generate a nicer plot with `plot_overTraj.py`.
-   * Change variables inside script.
-   * `python plot_overTraj.py`
-    
-
-
-## Check location of the tagged water molecule
-1. Print out locations using Tcl script for VMD. Finds WTT z-coordinate, relative to center of mass of (C21, C31) of POPC.
-   * `vmd -dispdev none -e printWTT.tcl -args input.psf input.dcd output.dat`
-
-2. View with xmgrace.
-   * `xmgrace output.dat &`
-
+* Plot just one file:
+    * `python area_box_lipid.py -i npt01.xst -n 144`
+* Plot one file compared to another:
+    * `python area_box_lipid.py -i /loc/of/sim1/npt01.xst -j /loc/of/sim2/npt01.xst -n 144`
+* Plot one file compared to another, with multiple simulations each:
+    * `python area_box_lipid.py -i /loc/of/sim1/npt01.xst /loc/of/sim1/npt02.xst -j /loc/of/sim2/npt01.xst /loc/of/sim2/npt02.xst -n 144`
 

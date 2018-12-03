@@ -1,6 +1,10 @@
 
-# Purpose: Print out z-locations of tagged water molecule in trajectory.
-# Usage:   vmd -dispdev none -e printWTT.tcl -args input.psf input.dcd output.dat
+# Purpose:  Print out z-position of permeant throughout trajectory.
+# Usage:    vmd -dispdev none -e get_z_position.tcl -args input.psf input.dcd output.dat
+# By:       Victoria T. Lim
+# Version:  Dec 3 2018
+# TODO:     [1] Change hard-coded variables to command line arguments
+
 
 package require tempoUserVMD
 
@@ -35,3 +39,4 @@ for {set i 0} {$i < $num_steps} {incr i} {
     $sel frame $i
     puts $idf "$i [$sel get z]"
 }
+
