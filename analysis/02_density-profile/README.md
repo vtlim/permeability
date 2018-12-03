@@ -1,14 +1,28 @@
-# README.md
 
-Purpose: calculate number density profile for (1) waters, (2) lipid headgroups, (3) carbonyls, (4) lipid chains.
+# Scripts for calculating membrane density profile 
+Last updated: Dec 3 2018
 
-This approach requires tempotools (by J. Alfredo Freites).
+The purpose of this analysis is to calculate the number density profile for a lipid bilayer. 
+Use this to analyze relative positions of water molecules and lipid sections (headgroup, carbonyl carbons, chains).
 
-Command: `vmd -dispdev none -e /your_path_to_tempotools/tempotools/libs/analysisMain.tcl -args analysisInp.tcl`
+This analysis requires tempotools package for VMD (by J. Alfredo Freites).
 
-References:
- 1. Interleaflet mixing and coupling in liquid-disordered phospholipid bilayers (Biochimica et Biophysica Acta, 2016)
- 2. Update of the CHARMM All-Atom Additive Force Field for Lipids: Validation on Six Lipid Types (J Phys Chem B, 2010)
- 3. Acyl-Chain Methyl Distributions of Liquid-Ordered and -Disordered Membranes (Biophysical Journal, 2011)
+## Contents
+* `analysisInp.tcl`
 
+## Example instructions
+1. Open the `analysisInp.tcl` file, and specify the following options inside:
+    * `dataDir` - gets prepended to both psf and dcd's; should end with forward slash
+    * `workDir`- optional, leave as "" if you want to work in the current directory
+    * psf file
+    * step size to read in trajectory
+    * trajectory file names
+    * calculation settings
+    * output settings
+2. `vmd -dispdev none -e /your_path_to_tempotools/tempotools/libs/analysisMain.tcl -args analysisInp.tcl`
+
+## References
+1. Interleaflet mixing and coupling in liquid-disordered phospholipid bilayers (Biochimica et Biophysica Acta, 2016)
+2. Update of the CHARMM All-Atom Additive Force Field for Lipids: Validation on Six Lipid Types (J Phys Chem B, 2010)
+3. Acyl-Chain Methyl Distributions of Liquid-Ordered and -Disordered Membranes (Biophysical Journal, 2011)
 

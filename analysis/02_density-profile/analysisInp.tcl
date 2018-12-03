@@ -1,7 +1,7 @@
 #
 # Victoria Lim, 16 June 2016
 # input file for trajectory analysis using VMD
-# 
+#
 # J. Alfredo Freites
 # The TEMPO group @ UCI
 # jfreites@uci.edu
@@ -25,24 +25,24 @@ set myAnalysis wdensC
 # trajFileType: file type for your trajectory file
 # step: step length used when reading the trajectory files
 
-set dataDir /pub/limvt/pmf/00_reference/
-set workDir /pub/limvt/pmf/analysis/02_ndens/
-set myPSF chipot_box.psf
+set dataDir /dfs2/tw/limvt/08_permeate/bilayer/step7b_equil-gpu-stoch/taut1_charged/
+set workDir ""
+set myPSF ../../step6_ligAndIon/taut1_charged/popc_t1pos.psf
 set trajFileType dcd
-set step 1
+set step 10
 
 
-# theFiles: 
+# theFiles:
 # Provide a TCL list of trajectory file names or use your TCL skills to build it
 
-set theFiles [list ../04_prod1/npt_01.dcd ../05_prod2/npt_02.dcd]
+set theFiles [list npt01.dcd npt02.dcd]
 # for {set i 2} {$i <= 6} {incr i} {
 #	lappend theFiles npt0${i}.dcd }
 
 
 # theFileRange:
-# Provide a TCL list with the first and last frame number to be analyzed in each 
-# trajectory file.  
+# Provide a TCL list with the first and last frame number to be analyzed in each
+# trajectory file.
 # Leave theFileRange empty (set to "") if you want all the frames of all the files
 # to be analyzed.
 
@@ -56,32 +56,32 @@ set theFileRange ""
 
 # Selections list
 #------------------------------------------------------------------------
-# mySelections: 
+# mySelections:
 # Provide a TCL list of VMD selection sentences or use your TCL skills to build it
 
 #set mySelections [list "selectionSentence1"  "selectionSentence2" ...]
 #set mySelections [list {selectionSentence1}  {selectionSentence2} ...]
 
-set mySelections [list water protein phosphate carbonyl choline lipid glycerol]
+set mySelections [list water protein phosphate carbonyl choline lipid glycerol "resname GBI1"]
 
 #------------------------------------------------------------------------
 
 
 # Output file names list
 #------------------------------------------------------------------------
-# Output file names are built by compounding three strings: 
+# Output file names are built by compounding three strings:
 # outFilePrefix, outFile, and outFileSuffix
-# outFile is any element of theOutFiles list 
+# outFile is any element of theOutFiles list
 
-# theOutfiles: 
-# Provide a TCL list of unique ids ONE for each SELECTION  
+# theOutfiles:
+# Provide a TCL list of unique ids ONE for each SELECTION
 # or use your TCL skills to build it
-# Leave theOutfiles empty (set to "") to use the selection sentences in mySelections 
+# Leave theOutfiles empty (set to "") to use the selection sentences in mySelections
 # as unique ids
 
 
 set theOutFiles ""
-set outFilePrefix ndens_wtt_
+set outFilePrefix ndens_taut1_
 set outFileSuffix .dat
 
 #------------------------------------------------------------------------
@@ -109,9 +109,9 @@ set outFileSuffix .dat
 # used in: myreference -- rmsdEvol axisEvol
 #	   selref -- ndens hbondPathCyl comEvol contactsEvol
 #
-# myreference: file name for a single configuration 
+# myreference: file name for a single configuration
 #	       dataDir is appended to the file name
-# selref: a valid VMD selection sentence 
+# selref: a valid VMD selection sentence
 
 #set myreference lacy-new-325p-pope.pdb
 set selref carbonyl
@@ -125,7 +125,7 @@ set selref carbonyl
 # dh,dr: bin width
 # weightType: hist weight n x none
 # labelSelections: valid vmd selection sentences to modify atomtypes
-# labelFractions: as many <= 1.0 as label selections 
+# labelFractions: as many <= 1.0 as label selections
 set hmin -65.0
 set hmax 65.0
 set dh 0.2
@@ -146,7 +146,7 @@ set weightType none
 #set angleCutoff 40.0
 
 # ______ Cylindrical Region Parameters ______
-# defines a cylindrical ROI by specifying the position of the 
+# defines a cylindrical ROI by specifying the position of the
 # bases and the square of the radius
 # in addition there is also a width for axial positions
 #
@@ -170,7 +170,7 @@ set weightType none
 # used in: directedGraph -- hbondPath hbondPathCyl
 #	   pathEndsSel -- hbondPath
 #
-# directedGraph: "yes" if the network has D->A links only 
+# directedGraph: "yes" if the network has D->A links only
 # pathEndsSel: A valid VMD selection sentence containing atoms in two residues only.
 
 #set directedGraph no
