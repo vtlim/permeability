@@ -17,7 +17,7 @@
 set skip 10  ;# skip 10 means every 2 ps, given (2 fs/step) and (1000 frames/step)
 set outDataFile /dfs2/tw/limvt/08_permeate/taut2/01_prep/pdb_sources.dat
 
-set permeant_text "segname WTT and name OH2"
+set permeant_text "resname GBI2"
 set reference_text "lipid and name C21 C31"
 
 # ========================== Variables ========================= #
@@ -42,8 +42,8 @@ if {$win_num <= 10} {
     set old [expr {$win_num - 1}]   }
 
 # read in PSF and load/wrap dcd
-mol new $psffile
-dopbc -file $trajfile -frames 0:$skip:-1
+mol new $inpsf
+dopbc -file $indcd -frames 0:$skip:-1
 
 # create selections
 set permeant [atomselect top $permeant_text]
@@ -70,10 +70,11 @@ for {set i $n} {$i > 0} {incr i -1} {
 
         # variables to print out in README file
         set bounds "\[$lowerB,$upperB\]"
-        set pdb [lindex [split $trajfile /] end]
+        set pdb [lindex [split $indcd /] end]
         set frm [expr {$i * $skip}]
         set timestamp [clock format [clock seconds]]
-        set newline "$win\t$bounds\t\t$pdb\t$frm\t\t$dist\t\t$timestamp"
+        set dist [format "%5.3f" $dist]
+        set newline "$win\t$bounds\t\t$pdb\t$frm (skip $skip)\t\t$dist\t\t$timestamp"
 
         # append README file with the newest selection
         set f [open $outDataFile a]
@@ -84,5 +85,5 @@ for {set i $n} {$i > 0} {incr i -1} {
     }
 }
 
-puts "no coordinates found with the given conditions"
+puts "no coordinates found with the given conditions, or else pdb file already exists"
 exit
