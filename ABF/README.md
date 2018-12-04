@@ -1,7 +1,7 @@
 
 # ABF simulations to calculate membrane permeability
 
-Last edited:     Oct 1 2018   
+Last edited:     Dec 3 2018   
 Test system:     TIP3P water molecule through a POPC bilayer   
 
 Water permeability in POPC is 136e-4 cm/s.  
@@ -10,11 +10,14 @@ See references in Comer paper in the main README file of this repository.
 
 ## Procedure
 
-1. Equilibrate system.
+1. Prepare and equilibrate system.
 
-2. Prepare starting coordinates (pdb files) for windows.
-   - From steered MD?
-   - From neighboring windows?
+2. Generate labeled reference PDB for colvars.
+    * Load system in PDB, then `source 1_labelpdb.tcl` 
+
+3. Prepare starting coordinates (pdb files) for each window.
+Here these coordinates come from neighboring windows but can come from other sources (pre-equilibration, steered MD, etc.).
+    1. 
 
 3. Run ABF calculations.
     1. The simulations obtain N number of samples per bin before applying the biasing force.  
@@ -39,7 +42,7 @@ Checking these files will only take a few minutes compared to the hours/days the
 1. NAMD configuration file  
     *. Copy namd configuration file to new file.
     1. Define new `outputName`.
-    2. Specify the restart file names (coor, vel, xsc).
+    2. Specify the input name from the previous run, for restart files (coor, vel, xsc).
     3. Set `firsttimestep` if desired.
     4. [if cont from run1] Comment temperature.
     5. [if cont from run1] Comment cellBasisVector(3), cellOrigin.
