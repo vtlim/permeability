@@ -9,12 +9,12 @@
 ## ADJUSTABLE PARAMETERS                                   ##
 #############################################################
 
-
+set Dir            FILL_ME_IN_FOR_WHOLE
 structure          FILL_ME_IN_FOR_WHOLE
 coordinates        ../00_ref/XX.pdb
 outputName         XX
 
-set temperature    295
+set temp           295
 
 # Continuing a job from the restart files
 if {0} {
@@ -40,7 +40,7 @@ parameters          /home/limvt/Documents/toppar/gbi_final.str
 
 # NOTE: Do not set the initial velocity temperature if you 
 # have also specified a .vel restart file!
-temperature         $temperature
+temperature         $temp
  
 
 # Periodic Boundary Conditions
@@ -81,14 +81,19 @@ PMEGridSpacing	    1.0
 if {0} {
 langevin            on      ;# do langevin dynamics
 langevinDamping     1       ;# damping coefficient (gamma) of 1/ps
-langevinTemp        $temperature
+langevinTemp        $temp
 }
-if {1} {
+if {0} {
 loweAndersen		on      ;# Use Lowe-Anderson Thermostat
-loweAndersenTemp	$temperature
+loweAndersenTemp	$temp
 loweAndersenCutoff	2.7     ;# 0.27 nm cutoff 
 loweAndersenRate	50  	;# 50 ps^-1  Default values and indicated by Chipot
 zeroMomentum		yes 	;# Necessary for LA thermostat
+}
+if {1} {
+stochRescale        on
+stochRescaleTemp    $temp
+stochRescalePeriod  1.0     ;# recd 0.5 to 2 ps
 }
 
 # Constant Pressure Control (variable volume)
@@ -101,7 +106,7 @@ langevinPiston        on
 langevinPistonTarget  1.01325 	;#  in bar -> 1 atm
 langevinPistonPeriod  200.0
 langevinPistonDecay   100.0
-langevinPistonTemp    $temperature
+langevinPistonTemp    $temp
 }
 
 
@@ -126,8 +131,8 @@ outputTiming       10000
 if {0} {
 constraints on
 consexp 2
-consref   ${Dir}chipot_box.cons.pdb
-conskfile ${Dir}chipot_box.cons.pdb
+consref   ${Dir}/chipot_box.cons.pdb
+conskfile ${Dir}/chipot_box.cons.pdb
 conskcol B
 }
 
@@ -138,6 +143,5 @@ colvarsConfig    ../00_ref/abfConfig.-----.inp
 #############################################################
 ## EXECUTION SCRIPT                                        ##
 #############################################################
-# Equilibrate _ ns
-reinitvels $temperature
+reinitvels $temp
 run 10000000 ;# 20 ns
