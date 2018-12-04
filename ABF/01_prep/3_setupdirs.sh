@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# Script to generate new window directory and run subdirectories.
-# Usage:    file.sh win# 
+# Purpose:  Script to generate new window directory and run subdirectories. 
+#           Run this in the main ABF directory containing the windows.
 # Example:  file.sh 6 -8 4
 # Version:  Dec 4 2018
+# By:       Victoria T. Lim
 
 
 # check that the lower bound is < upper bound
@@ -35,6 +36,7 @@ mkdir $dir/01
 mkdir $dir/02
 
 # copy over NAMD configuration files
+cp 01_prep/abf.win${dir}.pdb    $dir/00_ref/
 cp 01_prep/abfConfig.win00.inp  $dir/00_ref/abfConfig.${dir}.inp
 cp 01_prep/abf.win00.01.inp     $dir/01/abf.${dir}.01.inp
 cp 01_prep/abf.win00.02.inp     $dir/02/abf.${dir}.02.inp

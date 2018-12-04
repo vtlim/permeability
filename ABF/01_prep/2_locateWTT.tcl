@@ -1,72 +1,74 @@
-# Purpose: to find starting pdbs for continuing ABF simulations.
-# Date: 9 October 2016 
-# Usage: vmdt -e file.tcl
+
+# Purpose:      Obtain initial coordinates from equil simulations for starting new ABF windows.
+# By:           Victoria T. Lim
+# Version:      Dec 4 2018
+# Usage:        vmdt -e 2_locateWTT.tcl -args file.psf file.dcd windownumber lowerbound upperbound
+#               - windownumber should be a positive integer (0 prefix is added by script if the number < 10)
+#               - lowerbound/upperbound represents range (Angstrom) of where to find permeant, relative to reference
+# Notes:
+# [1] Can specify a smaller range (e.g., higher low bound, and lower high bound). Since snapshot is determined
+#     from center of mass of permeant, which means that part of the permeant may still be outside the range.
 
 
+# =============================================================== #
+#             Hard-coded variables for multiple use
+# =============================================================== #
 
-# ============= Things to change before using ============= #
+set skip 10  ;# skip 10 means every 2 ps, given (2 fs/step) and (1000 frames/step)
+set outDataFile /dfs2/tw/limvt/08_permeate/taut2/01_prep/pdb_sources.dat
 
-# these variables are changed by bash script. or chg manually.
-# win is window number, lowerB & upperB are z dist in Angstrom
-set wwin 5
-set lowerB 0
-set upperB 12
-#set trajfile /pub/limvt/pmf/05_prod2/npt_02.dcd
-set trajfile /pub/limvt/pmf/06_abf/win04-constRatio/01_run1/abf.win04.01.dcd
+set permeant_text "segname WTT and name OH2"
+set reference_text "lipid and name C21 C31"
 
+# ========================== Variables ========================= #
 
-#  --------------- Default variables ----------------------- #
+set inpsf   [lindex $argv 0]
+set indcd   [lindex $argv 1]
+set win_num [lindex $argv 2]
+set lowerB  [lindex $argv 3]
+set upperB  [lindex $argv 4]
 
-set skip 10  ;# for 2 fs/step & 1000 frames/step, each frame = 2 ps.
-set dir "/pub/limvt/pmf/06_abf"
-set psffile /pub/limvt/pmf/00_reference/chipot_box.psf
-set readme /pub/limvt/pmf/06_abf/README
+# =============================================================== #
 
-# ========================================================== #
-
-cd $dir
-
-#lappend auto_path /home/victoria/Documents/tempotools/libs
 package require tempoUserVMD
 
-
 # get the window number
-if {$wwin <= 10} {
-    scan $wwin %d win
-    set old 0[expr {$wwin - 1}]
-    set win 0$wwin
+if {$win_num <= 10} {
+    scan $win_num %d win
+    set old 0[expr {$win_num - 1}]
+    set win 0$win_num
    } else {
-    scan $wwin %d win
-    set old [expr {$wwin - 1}]   }
-
+    scan $win_num %d win
+    set old [expr {$win_num - 1}]   }
 
 # read in PSF and load/wrap dcd
 mol new $psffile
 dopbc -file $trajfile -frames 0:$skip:-1
 
 # create selections
-set wtt [atomselect top "segname WTT and name OH2"]
-set lip [atomselect top "lipid and name C21 C31"]
+set permeant [atomselect top $permeant_text]
+set refsel [atomselect top $reference_text]
 
 # loop backwards n-1,...,2,1
 set n [expr {[molinfo top get numframes]-1}]
 for {set i $n} {$i > 0} {incr i -1} {
+
     # update frames and selections
-    $wtt frame $i
-    $lip frame $i
+    $permeant frame $i
+    $refsel frame $i
 
-    # subtract z coords: water - center of mass of lipids
-    set dist [expr {[$wtt get z] - [lindex [measure center $lip] 2]}]
+    # subtract z coords: (center of mass of permeant) minus (center of mass of lipids)
+    set dist [expr {[lindex [measure center $permeant] 2] - [lindex [measure center $refsel] 2]}]
 
-    # set output filename. write pdb if file doesn't already exist.
-    set output ${dir}/win${win}-constRatio/00_ref/abf.win${win}.pdb
+    # if permeant is in range, write pdb if it doesn't already exist
+    set output abf.win${win}.pdb
     if { $lowerB <= $dist && $dist <= $upperB && ![file exists $output]} {
-        puts "=========== WTT distance (Ang): $dist ==========="
-        
+        puts "=========== Permeant distance (Ang): $dist ==========="
+
         # write out pdb of frame i
         animate write pdb $output beg $i end $i skip 1 0
 
-        # variables to print out in README file 
+        # variables to print out in README file
         set bounds "\[$lowerB,$upperB\]"
         set pdb [lindex [split $trajfile /] end]
         set frm [expr {$i * $skip}]
@@ -74,7 +76,7 @@ for {set i $n} {$i > 0} {incr i -1} {
         set newline "$win\t$bounds\t\t$pdb\t$frm\t\t$dist\t\t$timestamp"
 
         # append README file with the newest selection
-        set f [open $readme a]
+        set f [open $outDataFile a]
         puts $f $newline
         close $f
 
@@ -82,4 +84,5 @@ for {set i $n} {$i > 0} {incr i -1} {
     }
 }
 
+puts "no coordinates found with the given conditions"
 exit

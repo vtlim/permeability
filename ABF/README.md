@@ -10,7 +10,7 @@ Last edited:     Dec 4 2018
 │   ├── 1_labelpdb.tcl              Script to label PDB file for colvars reference atoms.
 │   ├── 2_locateWTT.tcl             Script to extract coordinates from trajectory for permeant in specified z-range.
 │   ├── 3_setupdirs.sh              Script to set up new window directory and configuration files.
-│   ├── abfConfig.win00.inp         colvar meta-eABF configuration file.
+│   ├── abfConfig.win00.inp         colvars meta-eABF configuration file.
 │   ├── abf.win00.01.inp            NAMD configuration file.
 │   ├── abf.win00.01RS.inp          NAMD configuration file for runs that need to be restarted.
 │   ├── abf.win00.02.inp            NAMD configuration file for continuation runs.
