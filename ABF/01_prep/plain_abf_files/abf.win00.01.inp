@@ -9,22 +9,22 @@
 ## ADJUSTABLE PARAMETERS                                   ##
 #############################################################
 
+set Dir            /pub/limvt/pmf/
+structure          ${Dir}00_reference/chipot_box.psf
+coordinates        ../00_ref/run01.pdb
+outputName         run01
 
-structure          FILL_ME_IN_FOR_WHOLE
-coordinates        ../00_ref/XX.pdb
-outputName         XX
-
-set temperature    295
+set temperature    308
 
 # Continuing a job from the restart files
-if {1} {
-set lastrun        restartXX
+if {0} {
+set lastrun        ""
 binCoordinates     $lastrun.restart.coor
 binVelocities      $lastrun.restart.vel  ;# remove the "temperature" entry if you use this!
 extendedSystem	   $lastrun.restart.xsc
 } 
 
-firsttimestep      XX
+firsttimestep      0
 
 
 #############################################################
@@ -33,33 +33,31 @@ firsttimestep      XX
 
 # Input
 paraTypeCharmm	    on
-parameters          /home/limvt/Documents/toppar/par_all36_lipid.prm
-parameters          /home/limvt/Documents/toppar/toppar_water_ions.jaf2.str
-parameters          /home/limvt/Documents/toppar/cgenff2b6/par_all36_cgenff.prm
-parameters          /home/limvt/Documents/toppar/gbi_final.str
+parameters	        ${Dir}../toppar/par_all36_lipid.prm
+parameters	        ${Dir}../toppar/toppar_water_ions.jaf.str
 
 # NOTE: Do not set the initial velocity temperature if you 
 # have also specified a .vel restart file!
-#temperature         $temperature
+temperature         $temperature
  
 
 # Periodic Boundary Conditions
 # NOTE: Do not set the periodic cell basis if you have also 
 # specified an .xsc restart file!
-if {0} { 
-cellBasisVector1  XX 0 	0
-cellBasisVector2  0  XX	0
-cellBasisVector3  0  0 	XX
+if {1} { 
+cellBasisVector1  67.512	0 		0
+cellBasisVector2  0 		52.626  	0
+cellBasisVector3  0 		0	 	115.821
 }
 
 # Force-Field Parameters
 exclude             scaled1-4
 1-4scaling          1.0
-cutoff              9.0     ;#Cutoff designated by calculation C by Comer et al. 2014
+cutoff              9.0;  #Cutoff designated by calculation C by Comer et al. 2014
 switching           on
 vdwForceSwitching   yes
-switchdist          8.0     ;# 1 A before cutoff
-pairlistdist        13.0    ;# set as 4 A above the cutoff
+switchdist          8.0;  # 1 A before cutoff
+pairlistdist        13.0; # set as 4 A above the cutoff
 margin              3.0
 
 # Integrator Parameters
@@ -133,10 +131,11 @@ conskcol B
 
 colvars	         on
 colvarsConfig    ../00_ref/abfConfig.-----.inp
-colvarsInput    $lastrun.restart.colvars.state ;# continue prev run
+#colvarsInput    $lastrun.restart.colvars.state ;# continue prev run
 
 #############################################################
 ## EXECUTION SCRIPT                                        ##
 #############################################################
 # Equilibrate _ ns
-run 10000000 ;# 20 ns
+reinitvels $temperature
+run 15000000 ;# 30 ns

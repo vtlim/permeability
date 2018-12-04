@@ -1,12 +1,36 @@
 
 # ABF simulations to calculate membrane permeability
+Last edited:     Dec 4 2018   
 
-Last edited:     Dec 3 2018   
-Test system:     TIP3P water molecule through a POPC bilayer   
+## Contents
 
-Water permeability in POPC is 136e-4 cm/s.  
-Comer got 60-80e-4 cm/s.  
-See references in Comer paper in the main README file of this repository.  
+```
+.
+├── 01_prep
+│   ├── 1_labelpdb.tcl              Script to label PDB file for colvars reference atoms.
+│   ├── 2_locateWTT.tcl             Script to extract coordinates from trajectory for permeant in specified z-range.
+│   ├── 3_setupdirs.sh              Script to set up new window directory and configuration files.
+│   ├── abfConfig.win00.inp         colvar meta-eABF configuration file.
+│   ├── abf.win00.01.inp            NAMD configuration file.
+│   ├── abf.win00.01RS.inp          NAMD configuration file for runs that need to be restarted.
+│   ├── abf.win00.02.inp            NAMD configuration file for continuation runs.
+│   ├── executor.sh
+│   └── plain_abf_files             Plain (not extended, not metadynamics) ABF configuration files.
+│       ├── abfConfig.win00.inp
+│       ├── abf.win00.01.inp
+│       ├── abf.win00.01RS.inp
+│       └── abf.win00.02.inp
+├── 02_analysis
+│   ├── abfCheckRunsError.tcl
+│   └── abfConvergence.tcl
+├── check_run_done.sh               Script to make sure ABF run completed successfully.
+├── new_abf_run.sh                  Script to set up new run for some ABF window.
+├── README.md
+└── water_toy_system.md             Details on toy system of TIP3P permeation through POPC bilayer.
+
+3 directories, 18 files
+
+```
 
 ## Procedure
 
@@ -55,25 +79,9 @@ Checking these files will only take a few minutes compared to the hours/days the
     2. input file name
     3. output file name
 
-
 Note: A separate colvars configuration file does not need to be applied for treatment of fullSamples.   
 The number of samples for `fullSamples` is saved and read from restart files, so when starting from   
 a simulation with sufficient sampling, the bias is applied immediately. [see q&a from namd mailing list](https://tinyurl.com/ya2qlttm)
-
-
-## Output of locateWTT.tcl script generating pdbs to start ABF windows.
-
-Bounds are listed in Angstrom, referring to the expression:   
-(z-coordinate of tagged water oxygen) minus (z-coordinate of center of mass of all lipid carbonyl atoms (C21, C31))
-
-Win	| Bounds	| PDB from traj		| Frame		| Distance WTT to center    | Date generated
-----|-----------|-------------------|-----------|---------------------------|-----------------------------
-01	| [32,44]	| npt_02.dcd	    | 4760		| 38.88967886567116		    | Mon Oct 10 10:33:24 PDT 2016
-02	| [24,36]	| npt_02.dcd	    | 4740		| 34.06346872448921		    | Mon Oct 10 10:33:58 PDT 2016
-03	| [16,28]	| npt_02.dcd	    | 4660		| 27.486047744750977		| Mon Oct 10 10:34:32 PDT 2016
-04	| [8,20]	| npt_02.dcd	    | 1740		| 18.665841072797775		| Mon Oct 10 10:35:06 PDT 2016
-05	| [0,12]	| abf.win04.01.dcd	| 14990		| 8.484895877540112		    | Fri Oct 14 17:15:37 PDT 2016
-06	| [-8,4]	| abf.win05.01.dcd	| 14980		| 2.450698971748352		    | Wed Oct 19 11:40:39 PDT 2016
 
 
 ## Analysis specific to ABF calculations

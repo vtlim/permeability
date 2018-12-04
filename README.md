@@ -3,7 +3,9 @@
 
 This repository contains scripts for preparing and analyzing molecular dynamics simulations to calculate 
 membrane permeabilities via three approaches: (1) umbrella sampling, (2) adaptive biasing force, and 
-(3) a variant of adaptive biasing force called meta-eABF. Simulations are run using the NAMD software package.
+(3) a variant of adaptive biasing force called meta-eABF. Simulations are run using the NAMD software package.  
+
+This document last updated: Dec 4 2018
 
 References:
 1. [Calculation of Lipid-Bilayer Permeabilities Using an Average Force](http://pubs.acs.org/doi/pdf/10.1021/ct400925s)
@@ -17,9 +19,8 @@ References:
 ```
 .
 ├── ABF
-│   ├── 01_setup
-│   ├── 02_filesCopy
-│   └── 03_analyses
+│   ├── 01_prep
+│   └── 02_analysis
 ├── US
 │   ├── 01_setup
 │   ├── 02_analysis
@@ -28,12 +29,11 @@ References:
 │   │   ├── 03_wham
 │   │   └── 04_mbar
 │   └── diffusivity
+├── analysis
+│   ├── 01_area-box-lipid
+│   ├── 02_density-profile
+│   ├── 03_permeant-position
+│   └── permeability
 └── waterbox
 ```
-
-## TODO
-1. argument parsing for `matchX.py`
-2. update ABF inputs/scripts
-3. update US inputs/scripts
-4. add meta-eABF inputs/scripts
 
