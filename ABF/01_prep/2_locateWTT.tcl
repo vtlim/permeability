@@ -35,11 +35,16 @@ package require tempoUserVMD
 # get the window number
 if {$win_num <= 10} {
     scan $win_num %d win
-    set old 0[expr {$win_num - 1}]
     set win 0$win_num
-   } else {
+} else {
     scan $win_num %d win
-    set old [expr {$win_num - 1}]   }
+    set win $win_num
+}
+set output abf.win${win}.pdb
+if {[file exists $output]} {
+    puts "\noutput pdb already exists for this window!\n"
+    exit
+}
 
 # read in PSF and load/wrap dcd
 mol new $inpsf
@@ -61,8 +66,7 @@ for {set i $n} {$i > 0} {incr i -1} {
     set dist [expr {[lindex [measure center $permeant] 2] - [lindex [measure center $refsel] 2]}]
 
     # if permeant is in range, write pdb if it doesn't already exist
-    set output abf.win${win}.pdb
-    if { $lowerB <= $dist && $dist <= $upperB && ![file exists $output]} {
+    if { $lowerB <= $dist && $dist <= $upperB } {
         puts "=========== Permeant distance (Ang): $dist ==========="
 
         # write out pdb of frame i
@@ -85,5 +89,5 @@ for {set i $n} {$i > 0} {incr i -1} {
     }
 }
 
-puts "no coordinates found with the given conditions, or else pdb file already exists"
+puts "no coordinates found with the given conditions"
 exit
