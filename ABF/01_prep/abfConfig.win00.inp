@@ -30,6 +30,7 @@ abf {
     colvars             ProjectionZ
     fullSamples         1000
     historyFreq         1000
+    writeCZARwindowFile on
 }
 
 metadynamics {
