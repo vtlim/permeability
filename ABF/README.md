@@ -1,6 +1,6 @@
 
 # ABF simulations to calculate membrane permeability
-Last edited:     Dec 4 2018   
+Last edited:     Dec 5 2018   
 
 ## Contents
 
@@ -24,11 +24,13 @@ Last edited:     Dec 4 2018
 │   ├── abfCheckRunsError.tcl
 │   └── abfConvergence.tcl
 ├── check_run_done.sh               Script to make sure ABF run completed successfully.
+├── job_scripts
+│   ├── namd_abf_neh.slurm          Greenplanet (Slurm) job script for NAMD, cpu, version 2.13b
+│   ├── namd_gpu.sge                HPC (Sun Grid Engine) job script for NAMD, gpu, version 2.13
+│   └── namd.pbs                    HPC (Sun Grid Engine) job script for NAMD, cpu, version 2.9 
 ├── new_abf_run.sh                  Script to set up new run for some ABF window.
 ├── README.md
 └── water_toy_system.md             Details on toy system of TIP3P permeation through POPC bilayer.
-
-3 directories, 18 files
 
 ```
 
@@ -41,7 +43,9 @@ Last edited:     Dec 4 2018
 
 3. Prepare starting coordinates (pdb files) for each window.
 Here these coordinates come from neighboring windows but can come from other sources (pre-equilibration, steered MD, etc.).
-    1. 
+Example commands:
+    1. `vmdt -e 2_locateWTT.tcl -args npt02.dcd 1 36 40`
+    2. `3_setupdirs.sh 1 32 44`
 
 3. Run ABF calculations.
     1. The simulations obtain N number of samples per bin before applying the biasing force.  

@@ -1,0 +1,14 @@
+#!/bin/bash
+#$ -N abf
+#$ -q gpu1080
+#$ -pe openmp 29
+#$ -m ea
+
+# load module
+module load gcc/6.4.0
+
+# run command
+export NAMD="/tw/limvt/local/namd/namd2.13_cuda"
+export LD_LIBRARY_PATH="${NAMD}:$LD_LIBRARY_PATH"
+$NAMD/charmrun +p $CORES $NAMD/namd2 abf.win01.01.inp > abf.win01.01.out
+

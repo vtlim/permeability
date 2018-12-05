@@ -1,0 +1,13 @@
+#!/bin/bash
+#$ -N a.win01.02
+#$ -q tw,pub64
+#$ -pe openmp 64
+#$ -m ea
+
+# Load the module
+module load NAMD-multicore/2.9
+
+# Grid Engine defines $CORES to make life easier.
+
+# Replace the input / output files:
+namd2 +p$CORES abf.win01.02.inp > abf.win01.02.out
