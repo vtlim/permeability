@@ -28,7 +28,7 @@ firststep=$3
 
 
 # get the last run number
-if [ $win -lt 10 ]; then
+if [ $run -lt 10 ]; then
    lastrun=0$((10#$run-1)) # use 10#$ to specify base 10 not octal
 else
    lastrun=$((run-1))
