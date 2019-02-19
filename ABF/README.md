@@ -31,7 +31,7 @@ Last edited:     Dec 5 2018
 ├── new_abf_run.sh                  Script to set up new run for some ABF window.
 ├── README.md
 ├── water_toy_system.md             Details on toy system of TIP3P permeation through POPC bilayer.
-└── win0merge                       Scripts used to facilitate merging of windows for full PMF profile.
+└── winmerge                        Scripts used to facilitate merging of windows for full PMF profile.
     ├── mergeColvars.inp
     ├── merge_.inp
     ├── merge.sh
