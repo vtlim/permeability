@@ -33,7 +33,7 @@ if __name__ == '__main__':
     grad = np.concatenate(gradlist)
 
     # average the values having same x gridpoint
-    x_unique, grad_mean =   npi.group_by(x).sum(grad)
+    x_unique, grad_mean =   npi.group_by(x).mean(grad)
 
     # make sure data are sorted by x in ascending order
     # if you want descending, add [::-1] after arr1inds
