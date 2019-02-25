@@ -3,9 +3,6 @@
 Last edited:     Dec 5 2018   
 
 ## TODO
-
-* clean code, add contents/documentation for `combine_leaflets.py`
-* clean code, add contents/documentation for `combine_windows.py`
 * update namd configuration files
 
 ## Contents
