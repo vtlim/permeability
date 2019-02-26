@@ -4,6 +4,7 @@ import numpy_indexed as npi
 from scipy import integrate
 
 # TODO: Add input file data to header from combining windows and for leaflets
+# TODO: remove the negative zero value if existing after symmetrization
 
 class Profile:
     def __init__(self, infile):
@@ -149,8 +150,8 @@ class Pmf(Profile):
         """
         # get indices of x0 and x1 values
         try:
-            x0_index = np.where(self.xdata==x0)[0][0]
-            x1_index = np.where(self.xdata==x1)[0][0]
+            x0_index = np.where(np.isclose(self.xdata, x0))[0][0]
+            x1_index = np.where(np.isclose(self.xdata, x1))[0][0]
         except IndexError as e:
             raise Exception("ERROR: at least one x-value not found or was " +
                 "found more than one time (IndexError)") from e
@@ -158,7 +159,7 @@ class Pmf(Profile):
         # calculate the mean of the region
         orig_mean = np.mean(
             self.ydata[ min(x0_index, x1_index):max(x0_index, x1_index)+1 ])
-        print("Unshifted mean from {} to {} == {}".format(x0, x1, orig_mean))
+        print("Unshifted mean from {} to {} == {:10.4f}".format(x0, x1, orig_mean))
 
         # shift the y-data
         shifted_ydata = self.ydata - orig_mean
