@@ -4,6 +4,7 @@ Last edited:     Dec 5 2018
 
 ## TODO
 * update namd configuration files
+* fix/update instructions on merging eABF windows
 
 ## Contents
 
