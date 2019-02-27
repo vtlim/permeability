@@ -6,7 +6,8 @@ from scipy import integrate
 class Profile:
     def __init__(self, infile):
         if infile is not None:
-            xdata, ydata = np.genfromtxt(infile, unpack=True)
+            # only unpack x and y data (ignoring error column if present)
+            xdata, ydata = np.genfromtxt(infile, usecols = (0, 1), unpack=True)
         else:
             xdata = None
             ydata = None
@@ -78,6 +79,15 @@ class Profile:
 
         self.xdata = sorted_x
         self.ydata = sorted_y
+
+    @staticmethod
+    def _get_kt(temperature):
+        """Compute thermal energy."""
+        # Boltzmann constant in kcal/(mol K)
+        kb = 0.0019872041
+        kt = kb*temperature
+
+        return kt
 
     def write_data(self, outfile, errbar=False):
         header = "Input data: {}".format(self.infile)
@@ -195,7 +205,7 @@ class Pmf(Profile):
         # compute difference before and after symmetrization
         if not np.array_equal(self.xdata, full_x):
             print("   error in subtracting pmfs before/after symmetrization" +
-                "\n   the xrange differs here:\n   " +
+                "\n   the x-range differs here:\n   " +
                 np.setdiff1d(self.xdata, full_x))
         else:
             subtracted = np.abs(self.ydata - full_y)
@@ -215,6 +225,8 @@ class Pmf(Profile):
         ----------
         list_pmfs : list
             list of the two Pmf objects to be combined
+        temperature : float
+            temperature of the system
 
         Returns
         -------
@@ -222,11 +234,12 @@ class Pmf(Profile):
             new Pmf object with xdata and ydata of combined pmfs
         """
 
-        # Boltzmann constant in kcal/(mol K)
-        kb = 0.0019872041
-        kt = kb*temperature
+        kt = Profile._get_kt(temperature)
 
         # combine all xdata and all ydata
+        if len(list_pmfs) != 2:
+            print("ERROR: More than 2 PMFs passed into join_leaflets function")
+            return
         x, pmf_raw, allfiles = Profile._decompose_list(list_pmfs)
 
         # take boltzmann weight of free energies
@@ -261,9 +274,65 @@ class Pmf(Profile):
         zeroes[keep_idx] = self.errbar[keep_idx]
         self.errbar = zeroes
 
+    @staticmethod
+    def calc_pka_shift(list_pmfs, temperature):
+        """Compute pKa shift profile by eq. 18 of the following work.
+        https://pubs.acs.org/doi/10.1021/jp7114912
+
+        Parameters
+        ----------
+        list_pmfs : list
+            list of the two Pmf objects, FIRST neutral and SECOND charged
+        temperature : float
+            temperature of the system
+
+        Returns
+        -------
+        new_pmf : Pmf
+            new Pmf object with xdata and ydata of combined pmfs
+        """
+
+        # extract constants and data
+        kt = Profile._get_kt(temperature)
+        x0 = list_pmfs[0].xdata
+        x1 = list_pmfs[1].xdata
+        y0 = list_pmfs[0].ydata
+        y1 = list_pmfs[1].ydata
+
+        # concatenate file names into single string
+        allfiles = " ".join([list_pmfs[0].infile, list_pmfs[1].infile])
+
+        # make sure xdata are equal for both
+        if len(list_pmfs) != 2:
+            print("ERROR: More than 2 PMFs passed into join_leaflets function")
+            return
+        if not np.array_equal(x0, x1):
+            print("   error in matching x-range for computing pka shift " +
+                "\n   the x-range differs here:\n   " +
+                np.setdiff1d(x0, x1))
+
+        # subtract pmf_neutral minus pmf_charged
+        dy = y0 - y1
+
+        # divide by 2.3*kt
+        dy = dy/(2.3*kt)
+
+        # create new pmf instance for joined data
+        new_pka = Pka()
+        new_pka.infile = allfiles
+        new_pka.xdata = x0
+        new_pka.ydata = dy
+
+        return new_pka
+
+class Pka(Profile):
+    def __init__(self, infile=None):
+        Profile.__init__(self, infile)
+
 if __name__ == "__main__":
 
     import argparse
+    import matplotlib.pyplot as plt
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-0", "--side0", required=True, nargs='+',
@@ -272,7 +341,21 @@ if __name__ == "__main__":
     parser.add_argument("-1", "--side1", required=True, nargs='+',
                         help="One or more files to be processed for other leaflet.")
 
+    parser.add_argument("-p", "--pka", action="store_true", default=False,
+                        help="Compute pKa shift profile from neutral PMF in -0"
+                        " flag and charged PMF in -1 flag")
+
     args = parser.parse_args()
+
+    if args.pka and len(args.side0)==1 and len(args.side1)==1:
+        pmf_neu = Pmf(args.side0[0])
+        pmf_chg = Pmf(args.side1[0])
+        pka_shift = Pmf.calc_pka_shift([pmf_neu, pmf_chg], 295)
+
+        plt.plot(pka_shift.xdata, pka_shift.ydata)
+        plt.grid()
+        plt.show()
+        quit()
 
     # combine windows of upper leaflet
     list_grads = []
@@ -307,7 +390,6 @@ if __name__ == "__main__":
     joined_pmf.subsample_errors(every_nth = 20)
 
     # plot final data
-    import matplotlib.pyplot as plt
     plt.errorbar(joined_pmf.xdata, joined_pmf.ydata, yerr=joined_pmf.errbar)
     plt.plot(pmf_top.xdata, pmf_top.ydata)
     plt.plot(pmf_bot.xdata, pmf_bot.ydata)
