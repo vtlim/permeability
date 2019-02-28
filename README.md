@@ -22,7 +22,7 @@ Selected references:
     * Averaging overlapping gradients from separate windows
     * Combining PMFs from separate leaflets
     * Setting average bulk water region of PMF to zero
-    * Symmetrizing PMF (for symmetrization by anti-symmetrization of weighted gradients see [here](analysis/permeability/abf_pmf_processor.py))
+    * Symmetrizing PMF (for symmetrization by anti-symmetrization of weighted gradients see [`symmetrize_profile.py`](analysis/permeability/symmetrize_profile.py))
     * Computing error by deviation from unsymmetrized PMF
     * Calculating pKa shift profile given two PMFs
 * See examples located [here](analysis/permeability/examples/) (feel free to contact me for more)
