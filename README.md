@@ -1,18 +1,17 @@
 
 # Calculation of membrane permabilities using molecular dynamics simulations
+This document last updated: Feb 28 2019
 
 This repository contains scripts for preparing and analyzing molecular dynamics simulations to calculate 
 membrane permeabilities via three approaches: (1) umbrella sampling, (2) adaptive biasing force, and 
 (3) a variant of adaptive biasing force called meta-eABF. Simulations are run using the NAMD software package.  
 
-This document last updated: Feb 28 2019
-
 Selected references:
-1. [Calculation of Lipid-Bilayer Permeabilities Using an Average Force](http://pubs.acs.org/doi/pdf/10.1021/ct400925s)
-2. [Simulation-Based Approaches for Determining Membrane Permeability of Small Compounds](http://pubs.acs.org/doi/pdf/10.1021/acs.jcim.6b00022)
-3. [NAMD user guide for version 2.13](https://www.ks.uiuc.edu/Research/namd/2.13/ug.pdf)
-4. [Smoothed Biasing Forces Yield Unbiased Free Energies with the Extended-System Adaptive Biasing Force Method](https://pubs.acs.org/doi/abs/10.1021/acs.jpcb.6b10055)
-5. [Zooming across the Free-Energy Landscape: Shaving Barriers, and Flooding Valleys](https://pubs.acs.org/doi/10.1021/acs.jpclett.8b01994)
+1. (ABF, water) [Calculation of Lipid-Bilayer Permeabilities Using an Average Force](http://pubs.acs.org/doi/full/10.1021/ct400925s)
+2. (eABF) [Smoothed Biasing Forces Yield Unbiased Free Energies with the Extended-System Adaptive Biasing Force Method](https://pubs.acs.org/doi/full/10.1021/acs.jpcb.6b10055)
+3. (meta-eABF) [Zooming across the Free-Energy Landscape: Shaving Barriers, and Flooding Valleys](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.8b01994)
+4. (ABF vs. US) [Simulation-Based Approaches for Determining Membrane Permeability of Small Compounds](http://pubs.acs.org/doi/full/10.1021/acs.jcim.6b00022)
+5. [NAMD user guide for version 2.13](https://www.ks.uiuc.edu/Research/namd/2.13/ug.pdf)
 
 -------------------------------------------------------------------------------------------------------
 
@@ -26,7 +25,10 @@ Selected references:
     * Computing error by deviation from unsymmetrized PMF
     * Calculating pKa shift profile given two PMFs
 * See examples located [here](analysis/permeability/examples/) (feel free to contact me for more)
-* The scripts for ABF are more up-to-date than the umbrella sampling ones, though all should be fully functional.  
+* The scripts for ABF are more up-to-date than the umbrella sampling ones, though all should be fully functional.
+* There is a C++ script here called [`diffusivity.cpp`](US/diffusivity/1_fromSI/diffusivity.cpp) which calculates autocorrelation functions and diffusivity from NAMD traj files.
+    * I did NOT write this script; it is from the SI of ref. 4 but in PDF format and without documentation.
+    * The code here was extracted from the SI, reformatted with proper spacing (fixing artifacts of copy/paste), and documented.
 
 
 ## Directory tree
