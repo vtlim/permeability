@@ -18,7 +18,7 @@ Selected references:
 
 ## Notes
 
-* There is a Python module to process NAMD PMFs located in this repo [here](analysis/permeability/abf_pmf_processor.py). Functions include:
+* There is a Python module here called [`abf_pmf_processor.py`](analysis/permeability/abf_pmf_processor.py) which processes NAMD ABF PMFs. Functions include:
     * Averaging overlapping gradients from separate windows
     * Combining PMFs from separate leaflets
     * Setting average bulk water region of PMF to zero
