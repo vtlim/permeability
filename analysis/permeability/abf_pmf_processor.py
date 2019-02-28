@@ -3,14 +3,15 @@ import numpy as np
 import numpy_indexed as npi
 from scipy import integrate
 
+# TODO: consider making the plotting lines in the main function more modular
+# TODO: check that file exists in __init__
+
 class Profile:
-    def __init__(self, infile):
-        if infile is not None:
+    def __init__(self, infile, xdata, ydata):
+        # if xdata and ydata are NOT passed, initiate object from file
+        if all(i is None for i in [xdata, ydata]):
             # only unpack x and y data (ignoring error column if present)
             xdata, ydata = np.genfromtxt(infile, usecols = (0, 1), unpack=True)
-        else:
-            xdata = None
-            ydata = None
         self._infile = infile
         self._xdata = xdata
         self._ydata = ydata
@@ -81,11 +82,11 @@ class Profile:
         self.ydata = sorted_y
 
     @staticmethod
-    def _get_kt(temperature):
+    def _get_kt(T):
         """Compute thermal energy."""
         # Boltzmann constant in kcal/(mol K)
         kb = 0.0019872041
-        kt = kb*temperature
+        kt = kb*T
 
         return kt
 
@@ -103,8 +104,8 @@ class Profile:
 
 class Grad(Profile):
 
-    def __init__(self, infile=None):
-        Profile.__init__(self, infile)
+    def __init__(self, infile=None, xdata=None, ydata=None):
+        super().__init__(infile, xdata, ydata)
 
     def integrate(self):
 
@@ -117,10 +118,7 @@ class Grad(Profile):
         x_pmf = x_pmf.flatten()
 
         # create new pmf object from integrated data
-        new_pmf = Pmf()
-        new_pmf.infile = self.infile
-        new_pmf.xdata = x_pmf
-        new_pmf.ydata = y_pmf
+        new_pmf = Pmf(self.infile, x_pmf, y_pmf)
 
         return new_pmf
 
@@ -147,10 +145,7 @@ class Grad(Profile):
         x_unique, grad_mean = npi.group_by(x).mean(grad)
 
         # create new grad instance for joined data
-        new_grad = Grad()
-        new_grad.infile = allfiles
-        new_grad.xdata = x_unique.flatten()
-        new_grad.ydata = grad_mean.flatten()
+        new_grad = Grad(allfiles, x_unique.flatten(), grad_mean.flatten())
 
         # reorder data for ascending x, then return object
         new_grad._sort_by_x()
@@ -158,8 +153,8 @@ class Grad(Profile):
 
 class Pmf(Profile):
 
-    def __init__(self, infile=None):
-        Profile.__init__(self, infile)
+    def __init__(self, infile=None, xdata=None, ydata=None):
+        super().__init__(infile, xdata, ydata)
 
     def shift_bulk_zero(self, x0, x1):
         """Compute average from x0 to x1, and shift the average to zero.
@@ -217,7 +212,7 @@ class Pmf(Profile):
 
 
     @staticmethod
-    def join_leaflets(list_pmfs, temperature):
+    def join_leaflets(list_pmfs, T):
         """Join PMFs by eq. 5 of the following work.
         https://pubs.acs.org/doi/10.1021/jp7114912
 
@@ -225,7 +220,7 @@ class Pmf(Profile):
         ----------
         list_pmfs : list
             list of the two Pmf objects to be combined
-        temperature : float
+        T : float
             temperature of the system
 
         Returns
@@ -234,7 +229,7 @@ class Pmf(Profile):
             new Pmf object with xdata and ydata of combined pmfs
         """
 
-        kt = Profile._get_kt(temperature)
+        kt = Profile._get_kt(T)
 
         # combine all xdata and all ydata
         if len(list_pmfs) != 2:
@@ -253,10 +248,7 @@ class Pmf(Profile):
         pmf_final = -1*kt*np.log(pmf_boltz_sum)
 
         # create new pmf instance for joined data
-        new_pmf = Pmf()
-        new_pmf.infile = allfiles
-        new_pmf.xdata = x_unique
-        new_pmf.ydata = pmf_final
+        new_pmf = Pmf(allfiles, x_unique, pmf_final)
 
         # reorder data for ascending x, then return object
         new_pmf._sort_by_x()
@@ -275,7 +267,7 @@ class Pmf(Profile):
         self.errbar = zeroes
 
     @staticmethod
-    def calc_pka_shift(list_pmfs, temperature):
+    def calc_pka_shift(list_pmfs, T):
         """Compute pKa shift profile by eq. 18 of the following work.
         https://pubs.acs.org/doi/10.1021/jp7114912
 
@@ -283,17 +275,17 @@ class Pmf(Profile):
         ----------
         list_pmfs : list
             list of the two Pmf objects, FIRST neutral and SECOND charged
-        temperature : float
+        T : float
             temperature of the system
 
         Returns
         -------
-        new_pmf : Pmf
-            new Pmf object with xdata and ydata of combined pmfs
+        new_pka : Pka
+            new Pka object with xdata and ydata of pKa shift profile
         """
 
         # extract constants and data
-        kt = Profile._get_kt(temperature)
+        kt = Profile._get_kt(T)
         x0 = list_pmfs[0].xdata
         x1 = list_pmfs[1].xdata
         y0 = list_pmfs[0].ydata
@@ -318,16 +310,101 @@ class Pmf(Profile):
         dy = dy/(2.3*kt)
 
         # create new pmf instance for joined data
-        new_pka = Pka()
-        new_pka.infile = allfiles
-        new_pka.xdata = x0
-        new_pka.ydata = dy
+        new_pka = Pka(allfiles, x0, dy)
 
         return new_pka
 
 class Pka(Profile):
-    def __init__(self, infile=None):
-        Profile.__init__(self, infile)
+    def __init__(self, infile=None, xdata=None, ydata=None):
+        super().__init__(infile, xdata, ydata)
+
+def open_join_grads(list_files):
+    """Open a list of files with .grad data and join the windows.
+    Should this be a static function? Maybe it doesn't make sense to call
+    Grad.open_join_grads(...) so maybe better off as module-level function.
+    """
+    list_grads = []
+    for f in list_files:
+        g = Grad(f)
+        list_grads.append(g)
+    joined_grad = Grad.join_windows(list_grads)
+    pmf = joined_grad.integrate()
+
+    return pmf
+
+def grads_to_pmf(side0_files, side1_files, bulk_range0, bulk_range1, T, out_file='pmf.dat'):
+    """Main function to generate symmetrized PMF given input gradient files.
+
+    Parameters
+    ----------
+    side0_files : list
+        list of strings of filenames for gradient files of one side leaflet
+    side1_files : list
+        list of strings of filenames for gradient files of one side leaflet
+    bulk_range0 : list
+        list of floats for x values that define bulk region for side0 PMF
+    bulk_range1 : list
+        list of floats for x values that define bulk region for side1 PMF
+    T : float
+        temperature of the system
+    out_file : string
+        filename of the output pmf data
+
+    Returns
+    -------
+    pmf_0 : Pmf
+        new Pmf object of side0
+    pmf_1 : Pmf
+        new Pmf object of side1
+    joined_pmf : Pmf
+        new Pmf object with xdata and ydata of joined PMF
+    """
+    # combine windows of each leaflet
+    pmf_0 = open_join_grads(side0_files)
+    pmf_1 = open_join_grads(side1_files)
+
+    # shift bulk water region to have average pmf of zero
+    pmf_0.shift_bulk_zero(*bulk_range0)
+    pmf_1.shift_bulk_zero(*bulk_range1)
+
+    # combine upper and lower leaflets
+    joined_pmf = Pmf.join_leaflets([pmf_0, pmf_1], T)
+
+    # symmetrize pmf
+    joined_pmf.symmetrize()
+
+    # write out pmf
+    joined_pmf.write_data('pmf.dat', errbar=True)
+
+    return pmf_0, pmf_1, joined_pmf
+
+def pmfs_to_pka(pmf0_file, pmf1_file, T, out_file='pka_shift.dat'):
+    """Main function to calculate pKa shift profile given 2 files of PMFs.
+
+    Parameters
+    ----------
+    pmf0_file : string
+        filename of the neutral PMF
+    pmf1_file : string
+        filename of the charged PMF
+    T : float
+        temperature of the system
+    out_file : string
+        filename of the output pKa shift profile data
+
+    Returns
+    -------
+    pka_shift : Pka
+        new Pka object with xdata and ydata of pKa shift profile
+    """
+
+    pmf_neu = Pmf(pmf0_file)
+    pmf_chg = Pmf(pmf1_file)
+    pka_shift = Pmf.calc_pka_shift([pmf_neu, pmf_chg], T)
+    pka_shift.write_data(out_file)
+
+    return pka_shift
+
 
 if __name__ == "__main__":
 
@@ -348,50 +425,24 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.pka and len(args.side0)==1 and len(args.side1)==1:
-        pmf_neu = Pmf(args.side0[0])
-        pmf_chg = Pmf(args.side1[0])
-        pka_shift = Pmf.calc_pka_shift([pmf_neu, pmf_chg], 295)
+        pka_shift = pmfs_to_pka(args.side0[0], args.side1[0], T = 295)
 
+        # plot final data
         plt.plot(pka_shift.xdata, pka_shift.ydata)
         plt.grid()
         plt.show()
-        quit()
 
-    # combine windows of upper leaflet
-    list_grads = []
-    for f in args.side0:
-        g = Grad(f)
-        list_grads.append(g)
-    joined_grad = Grad.join_windows(list_grads)
-    pmf_top = joined_grad.integrate()
+    else:
+        pmf_0, pmf_1, joined_pmf = grads_to_pmf(args.side0, args.side1,
+            bulk_range0 = [35, 39.9], bulk_range1 = [-35, -39.9],
+            T = 295)
 
-    # combine windows of lower leaflet
-    list_grads = []
-    for f in args.side1:
-        g = Grad(f)
-        list_grads.append(g)
-    joined_grad = Grad.join_windows(list_grads)
-    pmf_bot = joined_grad.integrate()
+        # for plotting: only keep every Nth error bar else hard to interpret
+        joined_pmf.subsample_errors(every_nth = 20)
 
-    # shift bulk water region to have average pmf of zero
-    pmf_top.shift_bulk_zero( 35, 39.9)
-    pmf_bot.shift_bulk_zero(-35,-39.9)
-
-    # combine upper and lower leaflets
-    joined_pmf = Pmf.join_leaflets([pmf_top, pmf_bot], 295)
-
-    # symmetrize pmf
-    joined_pmf.symmetrize()
-
-    # write out pmf (this same call can be used on Grad objects)
-    joined_pmf.write_data('pmf.dat', errbar=True)
-
-    # for plotting: only keep every Nth error bar else hard to interpret
-    joined_pmf.subsample_errors(every_nth = 20)
-
-    # plot final data
-    plt.errorbar(joined_pmf.xdata, joined_pmf.ydata, yerr=joined_pmf.errbar)
-    plt.plot(pmf_top.xdata, pmf_top.ydata)
-    plt.plot(pmf_bot.xdata, pmf_bot.ydata)
-    plt.grid()
-    plt.show()
+        # plot final data
+        plt.errorbar(joined_pmf.xdata, joined_pmf.ydata, yerr=joined_pmf.errbar)
+        plt.plot(pmf_0.xdata, pmf_0.ydata)
+        plt.plot(pmf_1.xdata, pmf_1.ydata)
+        plt.grid()
+        plt.show()
