@@ -7,6 +7,7 @@
 
 import glob
 import subprocess
+import numpy as np
 
 for filename in sorted(glob.iglob('win*/**/a*.out')):
     namd_done = False
@@ -21,4 +22,16 @@ for filename in sorted(glob.iglob('win*/**/a*.out')):
         job_success = True
 
     print("{}\t\tNAMD done: {}\t\tJob success: {}".format(filename, namd_done, job_success))
+
+quit()
+for k in range(11):
+    win_id = str(k).zfill(2)
+    count_files = sorted(glob.iglob('win*/czar_fix/win{}.**.abf1.count'.format(win_id)))
+
+    for f in count_files:
+        x, y = np.loadtxt(f, unpack=True)
+        print("{}\t\t{}\t\t{}".format(f, min(x), min(y)))
+        g = f.replace('count','zcount')
+        x, y = np.loadtxt(g, unpack=True)
+        print("{}\t\t{}\t\t{}".format(g, min(x), min(y)))
 
