@@ -16,6 +16,10 @@ for filename in sorted(glob.iglob('win*/**/a*.out')):
     # not memory efficient for large output files
     lines = list(reversed(open(filename).readlines()))[:5]
 
+    try:
+        a = lines[0]
+    except IndexError:
+        print("error with {}".format(filename))
     if "End of program" in lines[0]:
         namd_done = True
     if "WRITING VELOCITIES" in lines[4]:

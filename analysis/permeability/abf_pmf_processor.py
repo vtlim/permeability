@@ -366,6 +366,8 @@ def grads_to_pmf(side0_files, side1_files, bulk_range0, bulk_range1, T, out_file
     # shift bulk water region to have average pmf of zero
     pmf_0.shift_bulk_zero(*bulk_range0)
     pmf_1.shift_bulk_zero(*bulk_range1)
+    pmf_0.write_data('pmf0.dat')
+    pmf_1.write_data('pmf1.dat')
 
     # combine upper and lower leaflets
     joined_pmf = Pmf.join_leaflets([pmf_0, pmf_1], T)
