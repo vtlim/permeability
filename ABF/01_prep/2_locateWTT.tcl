@@ -33,7 +33,7 @@ set upperB  [lindex $argv 4]
 package require tempoUserVMD
 
 # get the window number
-if {$win_num <= 10} {
+if {$win_num < 10} {
     scan $win_num %d win
     set win 0$win_num
 } else {

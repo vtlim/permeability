@@ -18,7 +18,7 @@ set temp           295
 
 # Continuing a job from the restart files
 if {1} {
-set lastrun        restartXX
+set lastrun        ../01/restartXX
 binCoordinates     $lastrun.restart.coor
 binVelocities      $lastrun.restart.vel  ;# remove the "temperature" entry if you use this!
 extendedSystem	   $lastrun.restart.xsc
