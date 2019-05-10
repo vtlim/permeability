@@ -24,11 +24,11 @@ Selected references:
     * Symmetrizing PMF (for symmetrization by anti-symmetrization of weighted gradients see [`symmetrize_profile.py`](analysis/permeability/symmetrize_profile.py))
     * Computing error by deviation from unsymmetrized PMF
     * Calculating pKa shift profile given two PMFs
-* See examples located [here](analysis/permeability/examples/) (feel free to contact me for more)
+* See examples located [here](analysis/permeability/examples/)
 * The scripts for ABF are more up-to-date than the umbrella sampling ones, though all should be fully functional.
 * There is a C++ script here called [`diffusivity.cpp`](US/diffusivity/1_fromSI/diffusivity.cpp) which calculates autocorrelation functions and diffusivity from NAMD traj files.
-    * I did NOT write this script; it is from the SI of ref. 4 but in PDF format and without documentation.
-    * The code here was extracted from the SI, reformatted with proper spacing (fixing artifacts of copy/paste), and documented.
+    * I did NOT write this script; it is from the SI of ref. 4.
+    * The code here was extracted from the SI PDF, reformatted with proper spacing (fixing artifacts of copy/paste), and documentation was added.
 
 
 ## Directory tree
