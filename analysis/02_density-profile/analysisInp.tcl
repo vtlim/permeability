@@ -8,7 +8,8 @@
 #
 
 #Add here the path for the TEMPO analysis libraries
-lappend auto_path /data/users/limvt/tempotools/libs
+#lappend auto_path /data/users/limvt/tempotools/libs
+lappend auto_path /DFS-L/DATA/mobley/limvt/tempotools/libs
 
 # Add your own Libraries here
 #source
@@ -25,9 +26,9 @@ set myAnalysis wdensC
 # trajFileType: file type for your trajectory file
 # step: step length used when reading the trajectory files
 
-set dataDir /dfs2/tw/limvt/08_permeate/bilayer/step7b_equil-gpu-stoch/taut1_charged/
+set dataDir /DFS-L/old_beegfs_data/mobley/limvt/hv1/08_permeate/bilayer/step5_equil/
 set workDir ""
-set myPSF ../../step6_ligAndIon/taut1_charged/popc_t1pos.psf
+set myPSF ../step4_psf/fullmemb.psf
 set trajFileType dcd
 set step 10
 
@@ -35,7 +36,7 @@ set step 10
 # theFiles:
 # Provide a TCL list of trajectory file names or use your TCL skills to build it
 
-set theFiles [list npt01.dcd npt02.dcd]
+set theFiles [list npt01.dcd]
 # for {set i 2} {$i <= 6} {incr i} {
 #	lappend theFiles npt0${i}.dcd }
 
@@ -62,7 +63,7 @@ set theFileRange ""
 #set mySelections [list "selectionSentence1"  "selectionSentence2" ...]
 #set mySelections [list {selectionSentence1}  {selectionSentence2} ...]
 
-set mySelections [list water protein phosphate carbonyl choline lipid glycerol "resname GBI1"]
+set mySelections [list water phosphate carbonyl choline lipid glycerol]
 
 #------------------------------------------------------------------------
 
@@ -81,7 +82,7 @@ set mySelections [list water protein phosphate carbonyl choline lipid glycerol "
 
 
 set theOutFiles ""
-set outFilePrefix ndens_taut1_
+set outFilePrefix ndens_memb_
 set outFileSuffix .dat
 
 #------------------------------------------------------------------------
