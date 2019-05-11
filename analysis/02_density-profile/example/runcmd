@@ -1,0 +1,1 @@
+python ../plot_wdensc.py -f  ndens_wtt_lipid.dat ndens_wtt_glycerol.dat ndens_wtt_phosphate.dat ndens_wtt_carbonyl.dat ndens_wtt_choline.dat -b 6907001.01157573
