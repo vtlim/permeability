@@ -1,9 +1,8 @@
 
 # ABF simulations to calculate membrane permeability
-Last edited:     Dec 5 2018   
+Last edited:     Jun 10 2019
 
 ## TODO
-* update namd configuration files
 * fix/update instructions on merging eABF windows
 
 ## Contents
@@ -28,6 +27,7 @@ Last edited:     Dec 5 2018
 │   ├── abfCheckRunsError.tcl
 │   └── abfConvergence.tcl
 ├── check_run_done.sh               Script to make sure ABF run completed successfully.
+├── check_runs.py
 ├── job_scripts
 │   ├── namd_abf_neh.slurm          Greenplanet (Slurm) job script for NAMD, cpu, version 2.13b
 │   ├── namd_gpu.sge                HPC (Sun Grid Engine) job script for NAMD, gpu, version 2.13
@@ -42,6 +42,8 @@ Last edited:     Dec 5 2018
     ├── prep.sh
     └── README.md
 
+4 directories, 24 files
+
 ```
 
 ## Procedure
@@ -51,9 +53,8 @@ Last edited:     Dec 5 2018
 2. Generate labeled reference PDB for colvars.
     * Load system in PDB, then `source 1_labelpdb.tcl` 
 
-3. Prepare starting coordinates (pdb files) for each window.
-Here these coordinates come from neighboring windows but can come from other sources (pre-equilibration, steered MD, etc.).
-Example commands:
+3. Prepare starting coordinates (pdb files) for each window. In the `2_locateWTT.tcl` script, edit the `outDataFile` and `permeant_text`.
+   Coordinates may come from neighboring windows, pre-equilibration, steered MD, etc. Example call:
     1. `vmdt -e 2_locateWTT.tcl -args npt02.dcd 1 36 40`
     2. `3_setupdirs.sh 1 32 44`
 
@@ -64,14 +65,20 @@ Example commands:
     3. Extend each window with `updateBias` off. (vtl did not run)  
        This wasn't done in the referenced paper bc wasn't introduced until later (subdiffusion paper?)
 
-4. Stitch together PMF from the different windows.
+4. Maintain ABF calculations.
+    1. To continue ABF runs: (win, run, timestep)
+        * `/dfs2/tw/limvt/08_permeate/github/ABF/new_abf_run.sh 02 03 20000000`
+    2. One way of monitoring convergence:
+        * `for k in {01..11}; do echo $k; ls win$k/*/win$k.??.pmf; xg win$k/*/win$k.??.pmf; done`
+
+5. Stitch together PMF from the different windows.
     1. Generate symbolic links for every window's last .count and .grad files in your working directory.
     2. Prepare namd input file. No MD steps are run, but it's just to call namd.
     3. Prepare colvars input file. Specify the files from step (a) for the `inputPrefix` line.  
        Note that the namd user guide says the grid definition (min, max, width) can be changed.  
     4. Run the namd job: `namd merge.inp > merge.out`
 
-5. Calculate diffusivity using .traj files with DiffusionFusion.
+6. Calculate diffusivity using .traj files with DiffusionFusion.
 
 
 ### Things to change and check upon starting new continuation runs of a window
