@@ -4,23 +4,25 @@ Colvarsrestartfrequency 10000
 colvar {
     name ProjectionZ
     width 0.1
-    lowerboundary 24.0
-    upperboundary 36.0
-    lowerwallconstant 10.0
-    upperwallconstant 10.0
+    lowerBoundary XX
+    upperBoundary XX
+    lowerWallConstant 10.0
+    upperWallConstant 10.0
+    outputAppliedForce on
 
     distanceZ {
         main  {
             atomNumbers 41280 }
         ref {
-            atomsFile /pub/limvt/pmf/00_reference/wtt.ref.pdb
-            atomsCol B
-            atomsColValue 2.0 }
+            atomsFile       /pub/limvt/pmf/00_reference/wtt.ref.pdb
+            atomsCol        B
+            atomsColValue   2.0 }
     }
 }
 
 abf {
-    colvars      ProjectionZ
-    fullSamples  1000
-    historyFreq  1000
+    colvars             ProjectionZ
+    fullSamples         1000
+    historyFreq         1000
 }
+

@@ -136,5 +136,4 @@ colvarsInput    $lastrun.restart.colvars.state ;# continue prev run
 #############################################################
 ## EXECUTION SCRIPT                                        ##
 #############################################################
-# Equilibrate _ ns
 run 15000000 ;# 30 ns

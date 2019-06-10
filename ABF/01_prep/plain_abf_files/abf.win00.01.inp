@@ -136,6 +136,5 @@ colvarsConfig    ../00_ref/abfConfig.-----.inp
 #############################################################
 ## EXECUTION SCRIPT                                        ##
 #############################################################
-# Equilibrate _ ns
 reinitvels $temperature
 run 15000000 ;# 30 ns
