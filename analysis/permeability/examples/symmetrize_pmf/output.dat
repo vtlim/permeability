@@ -1,0 +1,4 @@
+Unshifted mean from  35.00 to  39.90 ==   -18.0148 kcal/mol
+Unshifted mean from -35.00 to -39.90 ==     0.0337 kcal/mol
+Value of pre-shifted bulk water region may be an artifact of where (x-value) integration begins, where y-value is defined 0.
+

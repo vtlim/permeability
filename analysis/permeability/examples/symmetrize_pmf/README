@@ -1,0 +1,4 @@
+
+python ../../abf_pmf_processor.py -0 win01.03.grad win02.04.grad win03.07.grad win04.07.grad win05.02.grad win06-top.03.grad -1 win06.03.grad win07.03.grad win08.04.grad win09.04.grad win10.04.grad win11.02.grad 
+
+
