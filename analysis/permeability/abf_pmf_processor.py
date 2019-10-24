@@ -5,6 +5,7 @@ from scipy import integrate
 
 # TODO: consider making the plotting lines in the main function more modular
 # TODO: check that file exists in __init__
+# TODO: add diagram from group meeting to Github
 
 class Profile:
     def __init__(self, infile, xdata, ydata):
@@ -95,12 +96,13 @@ class Profile:
 
         if errbar:
             np.savetxt(
-                outfile, np.c_[self.xdata,self.ydata,self.errbar],
-                header=header, fmt=['%.2f','%.6f','%.6f'])
+                outfile, np.c_[self.xdata, self.ydata, self.errbar],
+                header=header, fmt=['%.2f', '%.6f', '%.6f'])
         else:
             np.savetxt(
-                outfile, np.c_[self.xdata,self.ydata],
-                header=header, fmt=['%.2f','%.6f'])
+                outfile, np.c_[self.xdata, self.ydata],
+                header=header, fmt=['%.2f', '%.6f'])
+
 
 class Grad(Profile):
 
@@ -151,6 +153,7 @@ class Grad(Profile):
         new_grad._sort_by_x()
         return new_grad
 
+
 class Pmf(Profile):
 
     def __init__(self, infile=None, xdata=None, ydata=None):
@@ -176,7 +179,7 @@ class Pmf(Profile):
         # calculate the mean of the region
         orig_mean = np.mean(
             self.ydata[ min(x0_index, x1_index):max(x0_index, x1_index)+1 ])
-        print("Unshifted mean from {} to {} == {:10.4f}".format(x0, x1, orig_mean))
+        print("Unshifted mean from {:6.2f} to {:6.2f} == {:10.4f} kcal/mol".format(x0, x1, orig_mean))
 
         # shift the y-data
         shifted_ydata = self.ydata - orig_mean
@@ -314,9 +317,11 @@ class Pmf(Profile):
 
         return new_pka
 
+
 class Pka(Profile):
     def __init__(self, infile=None, xdata=None, ydata=None):
         super().__init__(infile, xdata, ydata)
+
 
 def open_join_grads(list_files):
     """Open a list of files with .grad data and join the windows.
@@ -332,7 +337,13 @@ def open_join_grads(list_files):
 
     return pmf
 
-def grads_to_pmf(side0_files, side1_files, bulk_range0, bulk_range1, T, out_file='pmf.dat'):
+
+def grads_to_pmf(
+    side0_files, side1_files,
+    bulk_range0, bulk_range1,
+    T,
+    out_file='pmf.dat'):
+
     """Main function to generate symmetrized PMF given input gradient files.
 
     Parameters
@@ -366,6 +377,8 @@ def grads_to_pmf(side0_files, side1_files, bulk_range0, bulk_range1, T, out_file
     # shift bulk water region to have average pmf of zero
     pmf_0.shift_bulk_zero(*bulk_range0)
     pmf_1.shift_bulk_zero(*bulk_range1)
+    print("Value of pre-shifted bulk water region may be an artifact of where "
+          "(x-value) integration begins, where y-value is defined 0.\n")
     pmf_0.write_data('pmf0.dat')
     pmf_1.write_data('pmf1.dat')
 
@@ -422,10 +435,11 @@ if __name__ == "__main__":
 
     parser.add_argument("-p", "--pka", action="store_true", default=False,
                         help="Compute pKa shift profile from neutral PMF in -0"
-                        " flag and charged PMF in -1 flag")
+                             " flag and charged PMF in -1 flag")
 
     args = parser.parse_args()
 
+    # compute pka shift profile
     if args.pka and len(args.side0)==1 and len(args.side1)==1:
         pka_shift = pmfs_to_pka(args.side0[0], args.side1[0], T = 295)
 
@@ -434,8 +448,10 @@ if __name__ == "__main__":
         plt.grid()
         plt.show()
 
+    # generate pmf from gradient files
     else:
-        pmf_0, pmf_1, joined_pmf = grads_to_pmf(args.side0, args.side1,
+        pmf_0, pmf_1, joined_pmf = grads_to_pmf(
+            args.side0, args.side1,
             bulk_range0 = [35, 39.9], bulk_range1 = [-35, -39.9],
             T = 295)
 
