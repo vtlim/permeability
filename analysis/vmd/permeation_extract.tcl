@@ -81,9 +81,9 @@ set lower [expr $zval - $tol]
 set upper [expr $zval + $tol]
 
 # take notes
-set outDataFile [open snapshots.extract w]
+set outDataFile [open snapshots.extract a]
 puts $outDataFile "# Input PSF: $inpsf\n# Input DCD, skip $inskip: $dcdlist"
-puts $outDataFile "# Output trajectory with permeant at z=$zval\n"
+puts $outDataFile "# Output trajectory with permeant at z=$zval"
 puts $outDataFile "# Distance (A) | Frame"
 mkdir tempwrapfiles
 
@@ -116,6 +116,8 @@ for {set i 0} {$i < $n} {incr i} {
         animate write pdb tempwrapfiles/$i.pdb beg $i end $i skip 1 0
     }
 }
+puts $outDataFile "\n"
+close $outDataFile
 
 # delete trajectory (mol 0) now that we're done, and reload psf (mol 1)
 mol delete 0
@@ -135,7 +137,6 @@ wrap_in_xy $seltxt $molid
 animate write dcd test.dcd waitfor all 1
 
 rm -r tempwrapfiles
-close $outDataFile
 
 exit
 
