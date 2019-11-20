@@ -2,29 +2,28 @@
 ## JOB DESCRIPTION                                         ##
 #############################################################
 
-# ABF of WTT permeation. 
+# ABF of WTT permeation.
 # PME, Constant Presure.
 
 #############################################################
 ## ADJUSTABLE PARAMETERS                                   ##
 #############################################################
 
-set Dir            /pub/limvt/pmf/
-structure          ${Dir}00_reference/chipot_box.psf
-coordinates        ../00_ref/run01.pdb
-outputName         run01-RS
+structure          ../../00_reference/popc_tcneu.psf
+coordinates        ../00_ref/XX.pdb
+outputName         XX-RS01
 
-set temperature    308
+set temp           295
 
 # Continuing a job from the restart files
 if {1} {
-set lastrun        ./run01
+set lastrun        ./XX
 binCoordinates     $lastrun.restart.coor
 binVelocities      $lastrun.restart.vel  ;# remove the "temperature" entry if you use this!
 extendedSystem	   $lastrun.restart.xsc
-} 
+}
 
-firsttimestep      0 ;# replace this value
+firsttimestep      XX
 
 
 #############################################################
@@ -33,35 +32,45 @@ firsttimestep      0 ;# replace this value
 
 # Input
 paraTypeCharmm	    on
-parameters	        ${Dir}../toppar/par_all36_lipid.prm
-parameters	        ${Dir}../toppar/toppar_water_ions.jaf.str
+if {0} {
+parameters          /home/limvt/Documents/toppar/par_all36_lipid.prm
+parameters          /home/limvt/Documents/toppar/toppar_water_ions.jaf2.str
+parameters          /home/limvt/Documents/toppar/cgenff3.0.1/par_all36_cgenff.prm
+parameters          /home/limvt/Documents/toppar/gbi-chlor-neu.str
+}
+if {1} {
+parameters          /dfs2/tw/limvt/toppar/par_all36_lipid.prm
+parameters          /dfs2/tw/limvt/toppar/toppar_water_ions.jaf2.str
+parameters          /dfs2/tw/limvt/toppar/cgenff3.0.1/par_all36_cgenff.prm
+parameters          /dfs2/tw/limvt/toppar/gbi-chlor-neu.str
+}
 
-# NOTE: Do not set the initial velocity temperature if you 
+# NOTE: Do not set the initial velocity temperature if you
 # have also specified a .vel restart file!
-#temperature         $temperature
- 
+#temperature         $temp
+
 
 # Periodic Boundary Conditions
-# NOTE: Do not set the periodic cell basis if you have also 
+# NOTE: Do not set the periodic cell basis if you have also
 # specified an .xsc restart file!
-if {0} { 
-cellBasisVector1  51.826	0 		0
-cellBasisVector2  0 		66.184  	0
-cellBasisVector3  0 		0	 	119.712
+if {0} {
+cellBasisVector1  XX 0	0
+cellBasisVector2  0  XX	0
+cellBasisVector3  0  0  XX
 }
 
 # Force-Field Parameters
 exclude             scaled1-4
 1-4scaling          1.0
-cutoff              9.0;  #Cutoff designated by calculation C by Comer et al. 2014
+cutoff              9.0     ;#Cutoff designated by calculation C by Comer et al. 2014
 switching           on
 vdwForceSwitching   yes
-switchdist          8.0;  # 1 A before cutoff
-pairlistdist        13.0; # set as 4 A above the cutoff
+switchdist          8.0     ;# 1 A before cutoff
+pairlistdist        13.0    ;# set as 4 A above the cutoff
 margin              3.0
 
 # Integrator Parameters
-timestep            2.0  ;# fs/step
+timestep            2.0     ;# fs/step
 rigidBonds          all
 nonbondedFreq       1
 fullElectFrequency  2
@@ -77,16 +86,21 @@ PMEGridSpacing	    1.0
 
 # Constant Temperature Control
 if {0} {
-langevin            on    ;# do langevin dynamics
-langevinDamping     1     ;# damping coefficient (gamma) of 1/ps
-langevinTemp        $temperature
+langevin            on      ;# do langevin dynamics
+langevinDamping     1       ;# damping coefficient (gamma) of 1/ps
+langevinTemp        $temp
 }
-if {1} {
+if {0} {
 loweAndersen		on      ;# Use Lowe-Anderson Thermostat
-loweAndersenTemp	$temperature
-loweAndersenCutoff	2.7     ;# 0.27 nm cutoff 
+loweAndersenTemp	$temp
+loweAndersenCutoff	2.7     ;# 0.27 nm cutoff
 loweAndersenRate	50  	;# 50 ps^-1  Default values and indicated by Chipot
 zeroMomentum		yes 	;# Necessary for LA thermostat
+}
+if {1} {
+stochRescale        on
+stochRescaleTemp    $temp
+stochRescalePeriod  1.0     ;# recd 0.5 to 2 ps
 }
 
 # Constant Pressure Control (variable volume)
@@ -99,13 +113,13 @@ langevinPiston        on
 langevinPistonTarget  1.01325 	;#  in bar -> 1 atm
 langevinPistonPeriod  200.0
 langevinPistonDecay   100.0
-langevinPistonTemp    $temperature
+langevinPistonTemp    $temp
 }
 
 
-restartfreq        10000   	;# 10000steps = every 20ps
-dcdfreq            1000	   	;# 1 ps
-xstFreq            10000   	;# every 1ps
+restartfreq        10000    ;# 10000steps = every 20ps
+dcdfreq            1000     ;# 1 ps
+xstFreq            10000    ;# every 1ps
 dcdUnitCell        yes;
 #velDCDfile        ${out}.vel
 #velDCDfreq        1000
@@ -118,14 +132,14 @@ outputTiming       10000
 #############################################################
 ## EXTRA PARAMETERS                                        ##
 #############################################################
-# Put here any custom parameters that are specific to 
+# Put here any custom parameters that are specific to
 # this job (e.g., SMD, TclForces, etc...)
 
 if {0} {
 constraints on
 consexp 2
-consref   ${Dir}chipot_box.cons.pdb
-conskfile ${Dir}chipot_box.cons.pdb
+consref   ${Dir}/chipot_box.cons.pdb
+conskfile ${Dir}/chipot_box.cons.pdb
 conskcol B
 }
 
@@ -136,7 +150,5 @@ colvarsInput    $lastrun.restart.colvars.state ;# continue prev run
 #############################################################
 ## EXECUTION SCRIPT                                        ##
 #############################################################
-# Equilibrate _ ns
-#reinitvels $temperature
-#run 13000000 ;# 26 ns
+#run 10000000 ;# 20 ns
 run 8580000
