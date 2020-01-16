@@ -23,8 +23,7 @@
 
 
 # import move_atoms.tcl and pbchelp.tcl
-set sourcedir /dfs3/pub/limvt/gitmisc/vmd
-set sourcedir ~/connect/hpc/goto-tw/gitmisc/vmd
+set sourcedir /dfs2/tw/limvt/08_permeate/github/analysis/vmd
 
 source $sourcedir/move_atoms.tcl
 source $sourcedir/pbchelp.tcl

@@ -462,5 +462,12 @@ if __name__ == "__main__":
         plt.errorbar(joined_pmf.xdata, joined_pmf.ydata, yerr=joined_pmf.errbar)
         plt.plot(pmf_0.xdata, pmf_0.ydata)
         plt.plot(pmf_1.xdata, pmf_1.ydata)
+        plt.xlabel('permeant position ($\mathrm{\AA}$)', fontsize=16)
+        plt.ylabel('pmf (kcal/mol)', fontsize=16)
+
+        #plt.tick_params(axis='both', which='major', labelsize=14)
+        plt.yticks(fontsize=14)
+        plt.ylim(-10, 20)
+
         plt.grid()
         plt.show()

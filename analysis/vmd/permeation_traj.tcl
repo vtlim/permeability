@@ -28,19 +28,19 @@
 # check these variables before using script
 
 # import wrapXY.tcl
-set sourcedir /dfs3/pub/limvt/gitmisc/vmd
-set sourcedir ~/connect/hpc/goto-tw/gitmisc/vmd
-
+set sourcedir ../../../github/analysis/vmd
 source $sourcedir/move_atoms.tcl
 source $sourcedir/wrapXY.tcl
+
+wrap_in_xy
 
 # define the range (inclusive) for collective variable distance
 set maxZ 40
 set minZ -41
-set spacing 1.0
+set spacing 0.5
 
 # define solute atomselection for VMD
-set seltxt "resname GBIN"
+set seltxt "resname GBI2"
 set high_to_low 1
 
 # ____________________________________________________________________________________
@@ -89,7 +89,7 @@ set lip [atomselect top "lipid and name C21 C31"]
 set all [atomselect top "all"]
 
 # take notes
-set outDataFile [open snapshots.wrap w]
+set outDataFile [open snapshots.wrap a]
 puts $outDataFile "# Input PSF: $inpsf\n# Input DCD, skip $inskip: $dcdlist"
 puts $outDataFile "# Snapshots from $minZ to $maxZ in increments of $spacing Angstrom\n"
 puts $outDataFile "# Distance (A) | Frame"

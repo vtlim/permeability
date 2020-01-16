@@ -59,8 +59,8 @@ def plot_profile(files, binvol, scale_component=False):
 
     ax1.legend(loc=(1.04, 0.5))
     ax1.set_ylim(bottom=-0.004)
-    ax1.set_ylabel(r'number densities ($\AA^{-3}$)')
-    ax1.set_xlabel(r'distance from membrane center ($\AA$)')
+    ax1.set_ylabel(r'number densities ($\mathrm{\AA}^{-3}$)')
+    ax1.set_xlabel(r'distance from membrane center ($\mathrm{\AA}$)')
     fig1.savefig('plot_raw.png', bbox_inches = 'tight')
 
     if scale_component:
