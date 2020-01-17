@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Usage: python symmetrize_profile.py -i profile.in [-c weights.dat] [--anti] -o output
+Usage: python symmetrize_for_uneven.py -i profile.in [-c weights.dat] [--anti] -o output
 
 Purpose: Symmetrize given data (e.g., diffusivity, PMF) across x-value of zero.
          Takes into account weighted averages, if weights (counts of data at
@@ -18,6 +18,10 @@ Version:    Oct 31 2018
 Reference:  10.1021/ct400925s
 
 Notes:
+- DID NOT RETURN CORRECT MAGNITUDE OF VALUES ON EVEN LENGTH DATA ON
+  MEMBRANE DENSITY PROFILES; VERIFY BEFORE USING
+- this script was written to handle symmetrization when the RHS data
+  was considerably longer than the LHS data
 - colvar = collective variable, referring to x-value
 - If your input data is the GRADIENT of the PMF, such as from adaptive biasing
   force, make sure to include the --anti flag. This changes the numerator of
