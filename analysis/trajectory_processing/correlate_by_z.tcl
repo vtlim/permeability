@@ -21,7 +21,7 @@ set permeant "gbi2"     ;# this should correspond with one of the vmd macros
 source ${homedir}/vmd_macros.txt
 
 # wrap box
-source ${homedir}/github/analysis/vmd/wrapXY.tcl
+source ${homedir}/github/analysis/trajectory_processing/wrapXY.tcl
 wrap_only 0 "resname POPC"
 
 # delete frame 0 of the pdb -- may be missing pbc parameters

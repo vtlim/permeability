@@ -30,8 +30,8 @@
 package require tempoUserVMD
 
 # import wrapXY.tcl
-set sourcedir /dfs2/tw/limvt/08_permeate/github/analysis/vmd
-#set sourcedir /home/limvt/Documents/gitperm/analysis/vmd
+set sourcedir /dfs2/tw/limvt/08_permeate/github/analysis/trajectory_processing
+#set sourcedir /home/limvt/Documents/gitperm/analysis/trajectory_processing
 source $sourcedir/move_atoms.tcl
 source $sourcedir/wrapXY.tcl
 

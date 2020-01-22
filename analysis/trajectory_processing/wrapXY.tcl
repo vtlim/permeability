@@ -23,8 +23,8 @@
 
 
 # import move_atoms.tcl and pbchelp.tcl
-set sourcedir /dfs2/tw/limvt/08_permeate/github/analysis/vmd
-set sourcedir /home/limvt/connect/hpc/goto-tw/08_permeate/github/analysis/vmd
+set sourcedir /dfs2/tw/limvt/08_permeate/github/analysis/trajectory_processing
+set sourcedir /home/limvt/connect/hpc/goto-tw/08_permeate/github/analysis/trajectory_processing
 
 source $sourcedir/move_atoms.tcl
 source $sourcedir/pbchelp.tcl
