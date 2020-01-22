@@ -28,7 +28,11 @@ def plot_profile(files, binvol, scale_component=False):
         fig2, ax2 = plt.subplots()
 
     for fname in files:
-        x, y = np.loadtxt(fname, usecols=(0, 2), unpack=True)
+        # === for raw file
+        #x, y = np.loadtxt(fname, usecols=(0, 2), unpack=True)
+        # === for symmetrized file
+        x, y = np.loadtxt(fname, usecols=(0, 1), unpack=True)
+
         l = re.split('[_.]', fname)[2]
 
         if scale_component:
@@ -61,7 +65,7 @@ def plot_profile(files, binvol, scale_component=False):
     ax1.set_ylim(bottom=-0.004)
     ax1.set_ylabel(r'number densities ($\mathrm{\AA}^{-3}$)')
     ax1.set_xlabel(r'distance from membrane center ($\mathrm{\AA}$)')
-    fig1.savefig('plot_raw.png', bbox_inches = 'tight')
+    fig1.savefig('plot_raw.svg', bbox_inches = 'tight', transparent=True)
 
     if scale_component:
         ax2.legend(loc=(1.04, 0.5))
