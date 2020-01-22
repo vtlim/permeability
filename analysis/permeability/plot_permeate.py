@@ -2,81 +2,132 @@
 
 """
 
-Usage: python plot_permeate.py -i abf_file_sympmf.dat [--pmf] [--diffuse]
+plot_permeate.py
 
-Purpose: Plot PMF or diffusivity for membrane permeability, formatting axes accordingly.
+Purpose: Plot PMF or diffusivity profiles. Check that units in script are
+    consistent with units in input files.
+
+Examples:
+- python plot_permeate.py -i pmf_symmetrized_with_errbars.dat --pmf         -w 'talk'
+- python plot_permeate.py -i diffusivity_symmetrized.dat      --diffusivity -w 'paper'
 
 By: Victoria T. Lim
-Version: Sep 21 2018
+Version: Jan 21 2020
 
 """
 
 import os, sys
 import numpy as np
+from scipy import interpolate
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 
 
-def plot_perm(in_file, out_file, pmf, diffuse):
+def plot_perm(in_files, out_file, pmf, diffuse, what_for='talk'):
 
     if pmf:
-        ptitle = 'Potential of Mean Force of Water\nthrough POPC bilayer (ABF)'
-        pxlabel = 'z coordinate ($\AA$)'
-        pylabel = 'free energy (kcal/mol)'
+        x_label = 'z coordinate ($\mathrm{\AA}$)'
+        y_label = 'free energy (kcal/mol)'
+        y_range = (-10, 15)
     elif diffuse:
-        ptitle = 'Diffusivity of Water\nthrough POPC bilayer (ABF)'
-        pxlabel = 'z coordinate ($\AA$)'
-        pylabel = 'diffusivity ($\AA^2/ns$)'
+        x_label = 'z coordinate ($\mathrm{\AA}$)'
+        y_label = 'diffusivity ($\mathrm{\AA}^2/ns$)'
+        y_range = (0, 800)
 
-    ### Read in data from file.
-    data_all = np.loadtxt(in_file)
-    full_cvs = data_all[:,0]
-    full_pmf = data_all[:,1]
-    try:
-        full_std = data_all[:,2]
-        with_err = True
-    except IndexError:
-        with_err = False
+    # google hex codes
+    colors = ['#ab30c4', '#f4b400', '#46bdc6', '#db4437', '#0f9d58', '#4285f4', '#ff6d00']
 
-    ### Initialize figure.
+    # read in data from file(s)
+    y_list = []
+    x_list = []
+    s_list = []
+    err_check_list = []
+    num_files = 0
+
+    for f in in_files:
+
+        # load data but don't unpack bc not sure of number of columns
+        data_all = np.loadtxt(f)
+
+        # get components of the data
+        x_list.append(data_all[:,0])
+        y_list.append(data_all[:,1])
+
+        # see if error bar values are in 2nd column
+        try:
+            s_list.append(data_all[:,2])
+            err_check_list.append(True)
+        except IndexError:
+            err_check_list.append(False)
+
+        # increment count
+        num_files += 1
+
+    # get legend labels from filenames
+    labels = [os.path.splitext(os.path.basename(x))[0] for x in in_files]
+
+    # initialize figure
     fig = plt.figure()
-    ax1 = fig.add_subplot(111)
+    ax = fig.gca()
 
-    ### Label the figure.
-#    ax1.set_title(ptitle,   fontsize=20)
-    ax1.set_xlabel(pxlabel, fontsize=18)
-    ax1.set_ylabel(pylabel, fontsize=19)
+    # set figure and font sizes based on what_for
+    if what_for == 'talk':
+        fig.set_size_inches(8, 6)
+        small_font = 16
+        large_font = 20
+    elif what_for == 'paper':
+        fig.set_size_inches(3.5, 2.5)
+        small_font = 10
+        large_font = 12
 
-    for xtick in ax1.get_xticklabels():
-        xtick.set_fontsize(14)
-    for ytick in ax1.get_yticklabels():
-        ytick.set_fontsize(14)
+    ax.set_xlabel(x_label, fontsize=large_font)
+    ax.set_ylabel(y_label, fontsize=large_font)
+    for xtick in ax.get_xticklabels():
+        xtick.set_fontsize(small_font)
+    for ytick in ax.get_yticklabels():
+        ytick.set_fontsize(small_font)
 
-    ### Plot the data.
-    if with_err:
-        ax1.errorbar(full_cvs, full_pmf, yerr=full_std,capsize=3,ecolor='k')
-    else:
-        ax1.plot(full_cvs, full_pmf)
+    # plot the data
+    for i in range(num_files):
 
-    ### set axes limits and tick marks
-    axes = plt.gca()
-    minorLocator = AutoMinorLocator(2)
+        # add error region
+        if err_check_list[i] == True:
 
-    axes.set_xlim([-37,37])
-    ax1.set_xticks(np.arange(-35,37,5),minor=True) # x: explicitly set minor ticks
+            ax.errorbar(x_list[i], y_list[i], label=labels[i], color=colors[i], yerr=s_list[i], elinewidth=0.1)
 
+            # plot with shaded error regions
+            #ax.fill_between(x_list[i], y_list[i]-s_list[i], y_list[i]+s_list[i],
+            #    facecolor='dimgray', alpha=0.35)
+
+        else:
+            ax.plot(x_list[i], y_list[i], label=labels[i], color=colors[i])
+
+    # show minor ticks on both sets of edges but not for major ticks
+    ax.xaxis.set_ticks_position('both')
+    ax.yaxis.set_ticks_position('both')
+    ax.tick_params('y', which='major', right=False)
+    ax.tick_params('x', which='major', top=False)
+
+    # format x-axis in common for both pmf and diffusivity
+    ax.set_xlim([-40, 40])
+    ax.set_xticks(np.arange(-40, 40, 2), minor=True)
+    ax.tick_params('both', which='minor', direction='in')
+
+    # format y-axis differently for pmf and diffusivity
     if pmf:
-        axes.set_ylim([-0.4,8.4])
-        ax1.set_yticks(np.arange(0,10,2)) # y: specify major ticks
+        ax.set_ylim([y_range[0], y_range[1]])
+        ax.set_yticks(np.arange(y_range[0], y_range[1], 2.5), minor=True)
     elif diffuse:
-        axes.set_ylim([-0,810])
-    ax1.yaxis.set_minor_locator(minorLocator) # y: specify minor ticks
+        ax.set_ylim([y_range[0], y_range[1]])
 
-    ### make tick marks bolder
-    ax1.tick_params('both', length=10, width=1.5, which='major')
-    ax1.tick_params('both', length=6, width=1, which='minor')
+    # add legend if multiple files
+    if num_files > 1:
 
-    ### Save and show.
+        # generate legend
+        plt.legend(fontsize=small_font-2)
+
+    # save and show
+    plt.grid()
     plt.savefig(out_file,bbox_inches='tight')
     plt.show()
 
@@ -87,9 +138,8 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-i", "--infile",
-                        help="Filename of the full length membrane profile of"
-                             " PMF or diffusivity to plot.")
+    parser.add_argument("-i", "--infiles", nargs='+',
+                        help="Filename(s) of PMF or diffusivity profile(s).")
 
     parser.add_argument("-p", "--pmf", action="store_true", default=False,
                         help="Format plot for potential of mean force.")
@@ -97,10 +147,10 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--diffuse", action="store_true", default=False,
                         help="Format plot for diffusivity.")
 
+    parser.add_argument("-w", "--what_for", default='talk',
+                        help="Format plot for either 'talk' or 'paper'.")
+
     args = parser.parse_args()
     opt = vars(args)
 
-    # define output name of figure
-    oname = os.path.splitext(args.infile)[0] + '.png'
-
-    plot_perm(args.infile, oname, args.pmf, args.diffuse)
+    plot_perm(args.infiles, 'output.png', args.pmf, args.diffuse, args.what_for)

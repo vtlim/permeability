@@ -446,6 +446,7 @@ if __name__ == "__main__":
         # plot final data
         plt.plot(pka_shift.xdata, pka_shift.ydata)
         plt.grid()
+        plt.savefig('plot_pka.png', bbox_inches='tight')
         plt.show()
 
     # generate pmf from gradient files
@@ -470,4 +471,5 @@ if __name__ == "__main__":
         plt.ylim(-10, 20)
 
         plt.grid()
+        plt.savefig('plot_pmf.png', bbox_inches='tight')
         plt.show()
