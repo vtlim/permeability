@@ -387,6 +387,7 @@ def grads_to_pmf(
 
     # symmetrize pmf
     joined_pmf.symmetrize()
+    #joined_pmf.errbar = np.zeros(len(joined_pmf.ydata))
 
     # write out pmf
     joined_pmf.write_data('pmf.dat', errbar=True)
