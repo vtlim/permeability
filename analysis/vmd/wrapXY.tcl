@@ -4,15 +4,15 @@
 # wrapXY.tcl
 #
 # Purpose:  Wrap trajectory in XY plane around selection.
-# Usage  :  vmdt -e permeation_traj.tcl -args inpsf skip dcd1 dcd2 ...
-# Usage: while in VMD --
-#    [1] wrap your trajectory to box beforehand (VTL unsure)
-#    [2] in vmd:  source wrapXY.tcl
-#    [3] in vmd:  wrap_in_xy "your vmd selection"
+# Usage:
+#   1. Load all trajectories in VMD.
+#   2. Wrap system to box (important, else wrapXY will not be wrapped to box)
+#   3. On VMD command line, without square brackets: [source wrapXY.tcl]
+#   4. On VMD command line, without square brackets: [wrap_in_xy "your vmd text selection"]
 #
 # Dependencies
-#  1. move_atoms.tcl
-#  2. pbchelper.tcl
+#   1. move_atoms.tcl
+#   2. pbchelper.tcl
 #
 # Assumptions
 #  - Only works on rectangular boxes
@@ -24,6 +24,7 @@
 
 # import move_atoms.tcl and pbchelp.tcl
 set sourcedir /dfs2/tw/limvt/08_permeate/github/analysis/vmd
+set sourcedir /home/limvt/connect/hpc/goto-tw/08_permeate/github/analysis/vmd
 
 source $sourcedir/move_atoms.tcl
 source $sourcedir/pbchelp.tcl
@@ -48,7 +49,7 @@ proc wrap_in_xy {seltxt {molid 0}} {
     set n [expr {[molinfo $molid get numframes]}]
     for {set i 0} {$i < $n} {incr i} {
         # print frame number periodically
-        if {[expr $i % 100 == 0]} {puts $i}
+        if {[expr $i % 20 == 0]} {puts $i}
 
         # update frame to get accurate selections/unit cell
         animate goto $i
