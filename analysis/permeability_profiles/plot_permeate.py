@@ -16,11 +16,9 @@ Version: Jan 21 2020
 
 """
 
-import os, sys
+import os
 import numpy as np
-from scipy import interpolate
 import matplotlib.pyplot as plt
-from matplotlib.ticker import AutoMinorLocator
 
 
 def plot_perm(in_files, out_file, pmf, diffuse, what_for='talk'):
