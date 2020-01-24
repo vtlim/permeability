@@ -21,16 +21,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def plot_perm(in_files, out_file, pmf, diffuse, what_for='talk'):
+def plot_perm(in_files, out_file, data_type, what_for='talk'):
 
-    if pmf:
-        x_label = 'z coordinate ($\mathrm{\AA}$)'
+    if data_type == 'pmf':
         y_label = 'free energy (kcal/mol)'
         y_range = (-10, 15)
-    elif diffuse:
-        x_label = 'z coordinate ($\mathrm{\AA}$)'
+    elif data_type == 'diffuse':
         y_label = 'diffusivity ($\mathrm{\AA}^2/ns$)'
         y_range = (0, 800)
+    elif data_type == 'orient':
+        y_label = 'permeant orientation'
+        y_range = (-1.5, 1.5)
 
     # google hex codes
     colors = ['#ab30c4', '#f4b400', '#46bdc6', '#db4437', '#0f9d58', '#4285f4', '#ff6d00']
@@ -78,7 +79,7 @@ def plot_perm(in_files, out_file, pmf, diffuse, what_for='talk'):
         small_font = 10
         large_font = 12
 
-    ax.set_xlabel(x_label, fontsize=large_font)
+    ax.set_xlabel('z coordinate ($\mathrm{\AA}$)', fontsize=large_font)
     ax.set_ylabel(y_label, fontsize=large_font)
     for xtick in ax.get_xticklabels():
         xtick.set_fontsize(small_font)
@@ -106,17 +107,14 @@ def plot_perm(in_files, out_file, pmf, diffuse, what_for='talk'):
     ax.tick_params('y', which='major', right=False)
     ax.tick_params('x', which='major', top=False)
 
-    # format x-axis in common for both pmf and diffusivity
+    # format x and y ranges
+    ax.set_ylim([y_range[0], y_range[1]])
     ax.set_xlim([-40, 40])
     ax.set_xticks(np.arange(-40, 40, 2), minor=True)
     ax.tick_params('both', which='minor', direction='in')
 
-    # format y-axis differently for pmf and diffusivity
-    if pmf:
-        ax.set_ylim([y_range[0], y_range[1]])
+    if data_type == 'pmf':
         ax.set_yticks(np.arange(y_range[0], y_range[1], 2.5), minor=True)
-    elif diffuse:
-        ax.set_ylim([y_range[0], y_range[1]])
 
     # add legend if multiple files
     if num_files > 1:
@@ -139,11 +137,8 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--infiles", nargs='+',
                         help="Filename(s) of PMF or diffusivity profile(s).")
 
-    parser.add_argument("-p", "--pmf", action="store_true", default=False,
-                        help="Format plot for potential of mean force.")
-
-    parser.add_argument("-d", "--diffuse", action="store_true", default=False,
-                        help="Format plot for diffusivity.")
+    parser.add_argument("-d", "--data_type", default='pmf',
+                        help="Type of input data. Options: 'pmf', 'diffuse', 'orient'")
 
     parser.add_argument("-w", "--what_for", default='talk',
                         help="Format plot for either 'talk' or 'paper'.")
@@ -151,4 +146,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     opt = vars(args)
 
-    plot_perm(args.infiles, 'output.png', args.pmf, args.diffuse, args.what_for)
+    plot_perm(args.infiles, 'output.png', args.data_type, args.what_for)
