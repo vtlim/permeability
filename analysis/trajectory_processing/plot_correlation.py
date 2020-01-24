@@ -62,6 +62,12 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
             [np.mean, np.std, len])
         return stats, bin_number
 
+    def write_to_file(means, stds, fname):
+        means = np.array(means).T
+        stds = np.array(stds).T
+        data_write = np.column_stack((bin_midpoints, means, stds))
+        np.savetxt(fname, data_write, fmt='%10.4f', delimiter='\t')
+
     # load the position data
     com_time, com_data = np.loadtxt(com_file, unpack=True)
 
@@ -112,9 +118,14 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
             # add data to plot
             means, stds, lens = plot_from_bins(bin_midpoints, stats, l)
 
+            # write information to file
+            write_to_file(means, stds, f'com_hbonds_{l}.dat')
+
+
         y_label = 'hydrogen bond count'
         fig_name = 'plot_hbonds.png'
         plt.legend(fontsize=small_font-2, loc='upper center')
+
 
 
     if orient_file is not None:
@@ -130,6 +141,9 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
         plt.grid()
         y_label = 'orientation'
         fig_name = 'plot_orientation.png'
+
+        # write information to file
+        write_to_file(means, stds, f'com_orient.dat')
 
         # print out details
         if verbose:
