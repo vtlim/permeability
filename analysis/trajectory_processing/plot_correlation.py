@@ -62,11 +62,6 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
             [np.mean, np.std, len])
         return stats, bin_number
 
-    if what_for == 'talk':
-        pass
-    else:
-        pass
-
     # load the position data
     com_time, com_data = np.loadtxt(com_file, unpack=True)
 
@@ -83,6 +78,19 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
     # bin the data to be grouped by position
     binned_com_inds = np.digitize(com_data, bins)
     bin_midpoints = (bins[1:] + bins[:-1]) / 2
+
+    # initialize figure
+    fig = plt.figure()
+    ax = fig.gca()
+
+    if what_for == 'talk':
+        fig.set_size_inches(8, 6)
+        small_font = 16
+        large_font = 20
+    else:
+        fig.set_size_inches(3.5, 2.5)
+        small_font = 10
+        large_font = 12
 
     # bin the hbonds and orientation data wrt binned position data
     if hbond_list is not None:
@@ -106,7 +114,7 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
 
         y_label = 'hydrogen bond count'
         fig_name = 'plot_hbonds.png'
-        plt.legend()
+        plt.legend(fontsize=small_font-2, loc='upper center')
 
 
     if orient_file is not None:
@@ -119,6 +127,7 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
 
         # add data to plot
         means, stds, lens = plot_from_bins(bin_midpoints, stats)
+        plt.grid()
         y_label = 'orientation'
         fig_name = 'plot_orientation.png'
 
@@ -131,8 +140,10 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
 
 
     # fancify the plot
-    plt.xlabel('distance from membrane center ($\mathrm{\AA}$)')
-    plt.ylabel(y_label)
+    plt.xlabel('distance from membrane center ($\mathrm{\AA}$)', fontsize=large_font)
+    plt.ylabel(y_label, fontsize=large_font)
+    plt.xticks(fontsize=small_font)
+    plt.yticks(fontsize=small_font)
     plt.savefig(fig_name, bbox_inches='tight')
     plt.show()
 
