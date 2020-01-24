@@ -89,7 +89,7 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
 
         # generate labels from filename(s)
         labels = [os.path.splitext(os.path.basename(x))[0] for x in hbond_list]
-        labels = [i.split('_')[1] for i in labels]
+        labels = [i.split('_')[-1] for i in labels]
 
         # load hbonds data
         hb_array = []

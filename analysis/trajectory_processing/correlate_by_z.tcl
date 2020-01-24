@@ -13,8 +13,13 @@
 # Last updated: Jan 22 2020
 # ============================================================== #
 
-set homedir "../../.."
+#set homedir "../../.."
+set homedir "/home/limvt/connect/hpc/goto-tw/08_permeate"
+set homedir "/dfs2/tw/limvt/08_permeate"
+
 set permeant "gbi2"     ;# this should correspond with one of the vmd macros
+
+# ============================================================== #
 
 # load macros for lipid-based selections
 #source /dfs2/tw/limvt/08_permeate/vmd_macros.txt
