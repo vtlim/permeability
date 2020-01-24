@@ -38,13 +38,7 @@ wrap_in_xy $permeant
 # get z position
 get_com_z $permeant
 
-# calculate hbonds
-count_hbonds $permeant "phosphate" "hbonds_phosphate"
-count_hbonds $permeant "carbonyl"  "hbonds_carbonyl"
-count_hbonds $permeant "water"     "hbonds_water"
-
 # calculate permeant orientation
-
 if {$permeant == "gbi1"} {
     calc_sel_orient "resname GBI1 and name C5"  "resname GBI1 and name N2"
 } elseif {$permeant == "gbi2"} {
@@ -56,4 +50,12 @@ if {$permeant == "gbi1"} {
 } elseif {$permeant == "gbcn"} {
     calc_sel_orient "resname GBCN and name C5"  "resname GBCN and name N3"
 }
+
+# calculate hbonds
+count_hbonds $permeant "phosphate" "hbonds_phosphate"
+count_hbonds $permeant "carbonyl"  "hbonds_carbonyl"
+
+# wrap system around permeant to account for periodic box edges
+wrap_only 0 $permeant
+count_hbonds $permeant "water"     "hbonds_water"
 
