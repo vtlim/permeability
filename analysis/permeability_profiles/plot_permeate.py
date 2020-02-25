@@ -21,10 +21,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+def subsample_errors(errlist, every_nth=20):
+    "Only keep every Nth value of error values."""
+    size = len(errlist)
+    subsamp = np.zeros(size)
+
+    # get indices which should be kept
+    keep_idx = range(0, size, every_nth)
+
+    # transfer the to-keep values into the array of zeros
+    subsamp[keep_idx] = np.array(errlist)[keep_idx]
+
+    return subsamp
+
+
 def plot_perm(in_files, out_file, data_type, what_for='talk'):
 
     if data_type == 'pmf':
-        y_label = 'free energy (kcal/mol)'
+        y_label = 'potential of mean\nforce (kcal/mol)'
         y_range = (-10, 15)
     elif data_type == 'diffuse':
         y_label = 'diffusivity ($\mathrm{\AA}^2/ns$)'
@@ -92,7 +106,9 @@ def plot_perm(in_files, out_file, data_type, what_for='talk'):
         # add error region
         if err_check_list[i] == True:
 
-            ax.errorbar(x_list[i], y_list[i], label=labels[i], color=colors[i], yerr=s_list[i], elinewidth=0.1)
+            subsamp_errs = subsample_errors(s_list[i], 10)
+            ax.errorbar(x_list[i], y_list[i], label=labels[i], color=colors[i],
+                yerr=subsamp_errs, elinewidth=1.0)
 
             # plot with shaded error regions
             #ax.fill_between(x_list[i], y_list[i]-s_list[i], y_list[i]+s_list[i],
