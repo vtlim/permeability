@@ -55,9 +55,17 @@ def plot_from_bins(bin_midpoints, stats, label=''):
     return means, stds, lens
 
 
-def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='talk', verbose=False):
+def plot_correlation(com_file, hbond_list, orient_file, n_bins=50,
+    symmetry=False, what_for='talk', verbose=False):
+    """
+    symmetry : Boolean
+        apply membrane symmetry by treating bins with abs(z)=0,
+        for example, treating z=-30 together with z=30, such as
+        finding the mean number of hydrogen bonds at that position
+    """
 
     def call_bin_stats(ydata):
+        # request mean/std/len for each bin given pre-defined bins
         stats, bin_number = bin_stats(ydata, binned_com_inds,
             [np.mean, np.std, len])
         return stats, bin_number
@@ -70,20 +78,21 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
 
     # load the position data
     com_time, com_data = np.loadtxt(com_file, unpack=True)
-
-    # define bins based on range of positions
+    if symmetry:
+        com_data = np.abs(com_data)
     com_min = np.min(com_data)
     com_max = np.max(com_data)
 
+    # separate the center of mass position data into bins based on min/max
     # add offset to com_max so that com_max doesn't get a bin by itself
-    # see example for right=False (default) on np.digitize docs
+    # see np.digitize docs for example for right=False (default)
     bins = np.linspace(com_min, com_max+.00001, n_bins+1)
+    bin_midpoints = (bins[1:] + bins[:-1]) / 2
     print(f"\nData will be grouped into {n_bins} bins spanning a range from "
           f"{com_min:.2f} to {com_max:.2f}. Bin edges:\n{bins}\n")
 
-    # bin the data to be grouped by position
+    # bin the center of mass data (x-axis) for bin_stats function
     binned_com_inds = np.digitize(com_data, bins)
-    bin_midpoints = (bins[1:] + bins[:-1]) / 2
 
     # initialize figure
     fig = plt.figure()
@@ -98,7 +107,7 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
         small_font = 10
         large_font = 12
 
-    # bin the hbonds and orientation data wrt binned position data
+    # process and plot hbonds data
     if hbond_list is not None:
 
         # generate labels from filename(s)
@@ -111,7 +120,7 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
             hb_time, hb_data = np.loadtxt(f, unpack=True)
             hb_array.append(hb_data)
 
-        # group data to bins and calculate stats of each bin
+        # group hbonds data to bins and calculate stats of each bin
         for l, hb_data in zip(labels, hb_array):
             stats, bin_number = call_bin_stats(hb_data)
 
@@ -121,13 +130,16 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
             # write information to file
             write_to_file(means, stds, f'com_hbonds_{l}.dat')
 
-
+        # refine plot details
         y_label = 'hydrogen bond count'
-        fig_name = 'plot_hbonds.png'
-        plt.legend(fontsize=small_font-2, loc='upper center')
+        fig_name = 'plot_hbonds.svg'
+        plt.legend(fontsize=small_font-2, loc='upper left')
+        plt.xlim(0, 40)
+        plt.ylim(-0.8, 11)
+        plt.grid()
 
 
-
+    # process and plot orientation data
     if orient_file is not None:
 
         # load the orientation data
@@ -153,8 +165,8 @@ def plot_correlation(com_file, hbond_list, orient_file, n_bins=50, what_for='tal
                       f"{stds[i]:.2f}\t{lens[i]}")
 
 
-    # fancify the plot
-    plt.xlabel('distance from membrane center ($\mathrm{\AA}$)', fontsize=large_font)
+    # fancify final plot (in common for hbonds and orientation plots)
+    plt.xlabel('distance from membrane center ($\mathrm{\AA}$)', fontsize=small_font)
     plt.ylabel(y_label, fontsize=large_font)
     plt.xticks(fontsize=small_font)
     plt.yticks(fontsize=small_font)
@@ -187,6 +199,11 @@ if __name__ == "__main__":
                         help="Permeant orientation data. Formatted as two "
                         "columns: time and orientation")
 
+    parser.add_argument("-s", "--symmetry", action="store_true", default=False,
+                        help="Apply symmetry across the membrane such that "
+                        "the reported value for bin z=30 to 35 A represents "
+                        "the mean of data at z=30-35 A and at -z=30=35 A")
+
     parser.add_argument("-w", "--what_for", default='talk',
                         help="Format plot for either 'talk' or 'paper'.")
 
@@ -197,4 +214,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     opt = vars(args)
 
-    plot_correlation(args.com, args.hbond, args.orient, args.nbins, args.what_for, args.verbose)
+    plot_correlation(args.com, args.hbond, args.orient, args.nbins,
+        args.symmetry, args.what_for, args.verbose)
