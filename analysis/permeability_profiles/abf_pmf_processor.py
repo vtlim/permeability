@@ -384,6 +384,7 @@ def grads_to_pmf(
 
     # combine upper and lower leaflets
     joined_pmf = Pmf.join_leaflets([pmf_0, pmf_1], T)
+    joined_pmf.write_data('pmf_unsym.dat')
 
     # symmetrize pmf
     joined_pmf.symmetrize()
