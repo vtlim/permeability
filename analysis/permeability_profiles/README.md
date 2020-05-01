@@ -5,10 +5,21 @@
     * Example usage:  
         `python abf_pmf_processor.py -0 [win01.grad win02.grad win03.grad] -1 [win04.grad win05.grad win06.grad]`
 
-* Compute permeability from the PMF and diffusivity profiles.
+* Calculate permeability coefficient from the PMF and diffusivity profiles.
     * Script: `calc_perme.py`
     * Example usage:  
         `python calc_perme.py -p gbi2.pmf -d gbi2.dif -t 295`
+
+* Calculate the pKa shift profiles from two potentials of mean force.
+    * Script: `calc_pka_shift.py`
+    * Example usage:  
+        `placeholder`
+    * Note: This script is a standalone version of the same function as used in `abf_pmf_processor.py` with the exception that this script reads in error bars associated with the PMFs and propagates the errors to the pKa shift profiles.
+
+* Calculate partition coefficient and free energy difference from the potential of mean force.
+    * Script: `calc_pmf_partition.py`
+    * Example usage:  
+        `python ../calc_pmf_partition.py -i GBIN.dat --z1 " -35" --z2 "35" -t 295`
 
 * Match x-axis data between two different profiles.
     * Script: `matchX.py`
@@ -24,7 +35,7 @@
     * Script: `symmetrize.py`
     * Example usage:  
         `python symmetrize.py -i input.dat -o output.dat -c 1`
-    * Note: This script is a standalone version of the same function is used in `abf_pmf_processor.py` with the exception that this script doesn't (yet) compute the error difference of the profiles before and after symmetrization.
+    * Note: This script is a standalone version of the same function as used in `abf_pmf_processor.py` with the exception that this script DOESN'T (yet) compute the error difference of the profiles before and after symmetrization.
 
 ### Contents
 
