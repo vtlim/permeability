@@ -45,8 +45,6 @@ Notes:
   component exp(-beta*E_i) before summing to do more of a true integral. If
   all dx the same, they would cancel out on numerator/denominator.
 
-- Final uncertainty propagation ONLY works on two states
-
 """
 
 def calc_pmf_partition(infile, z1, z2, temperature):
