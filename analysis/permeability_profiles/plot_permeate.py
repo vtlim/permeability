@@ -51,8 +51,9 @@ def plot_perm(in_files, out_file, data_type, what_for='talk'):
         y_range = (-0.9, 4.0)
 
     # google hex codes
-    colors = ['#ab30c4', '#f4b400', '#46bdc6', '#db4437', '#0f9d58', '#4285f4', '#ff6d00']
-    #colors = ['#46bdc6', '#ff6d00'] # GBIC and GBCN
+    #colors = ['#0f9d58', '#ab30c4', '#46bdc6', '#f4b400', '#db4437', '#4285f4', '#ff6d00']
+    colors = ['#0f9d58', '#ab30c4', '#f4b400'] # 2GBI
+    #colors = ['#46bdc6', '#db4437'] # CGBI
 
     # read in data from file(s)
     y_list = []
@@ -97,7 +98,7 @@ def plot_perm(in_files, out_file, data_type, what_for='talk'):
         small_font = 10
         large_font = 12
 
-    ax.set_xlabel('z coordinate ($\mathrm{\AA}$)', fontsize=large_font)
+    ax.set_xlabel('distance from membrane center ($\mathrm{\AA}$)', fontsize=large_font)
     ax.set_ylabel(y_label, fontsize=large_font)
     for xtick in ax.get_xticklabels():
         xtick.set_fontsize(small_font)
@@ -110,33 +111,33 @@ def plot_perm(in_files, out_file, data_type, what_for='talk'):
         # add error region
         if err_check_list[i] == True:
 
-#            # option 1: plot with solid error bars, every nth
-#            subsamp_errs = subsample_errors(s_list[i], 10)
-#            ax.errorbar(x_list[i], y_list[i], label=labels[i], color=colors[i],
-#                yerr=subsamp_errs, elinewidth=1.0)
+            # option 1: plot with solid error bars, every nth
+            subsamp_errs = subsample_errors(s_list[i], 10)
+            ax.errorbar(x_list[i], y_list[i], label=labels[i], color=colors[i],
+                yerr=subsamp_errs, elinewidth=1.0)
 
-            # option 2: plot with shaded error regions
-            ax.plot(x_list[i], y_list[i], label=labels[i], color=colors[i])
-            ax.fill_between(x_list[i], y_list[i]-s_list[i], y_list[i]+s_list[i],
-                color=colors[i], alpha=0.12)
+#            # option 2: plot with shaded error regions
+#            ax.plot(x_list[i], y_list[i], label=labels[i], color=colors[i])
+#            ax.fill_between(x_list[i], y_list[i]-s_list[i], y_list[i]+s_list[i],
+#                color=colors[i], alpha=0.12)
 
         else:
             ax.plot(x_list[i], y_list[i], label=labels[i], color=colors[i])
 
     # show minor ticks on both sets of edges but not for major ticks
-    ax.xaxis.set_ticks_position('both')
-    ax.yaxis.set_ticks_position('both')
-    ax.tick_params('y', which='major', right=False)
-    ax.tick_params('x', which='major', top=False)
+#    ax.xaxis.set_ticks_position('both')
+#    ax.yaxis.set_ticks_position('both')
+#    ax.tick_params('y', which='major', right=False)
+#    ax.tick_params('x', which='major', top=False)
 
     # format x and y ranges
     ax.set_ylim([y_range[0], y_range[1]])
     ax.set_xlim([-40, 40])
-    ax.set_xticks(np.arange(-40, 40, 2), minor=True)
-    ax.tick_params('both', which='minor', direction='in')
+#    ax.set_xticks(np.arange(-40, 40, 2), minor=True)
+#    ax.tick_params('both', which='minor', direction='in')
 
-    if data_type == 'pmf':
-        ax.set_yticks(np.arange(y_range[0], y_range[1], 2.5), minor=True)
+#    if data_type == 'pmf':
+#        ax.set_yticks(np.arange(y_range[0], y_range[1], 2.5), minor=True)
 
 #    # (optional) shade custom regions for orientation plot
 #    ax.axvspan(8, 20, facecolor='lightgrey', alpha=0.95)
@@ -163,7 +164,8 @@ if __name__ == "__main__":
                         help="Filename(s) of PMF or diffusivity profile(s).")
 
     parser.add_argument("-d", "--data_type", default='pmf',
-                        help="Type of input data. Options: 'pmf', 'diffuse', 'orient'")
+                        help="Type of input data. Options: 'pmf', 'diffuse', "
+                             "'orient', 'pka' ")
 
     parser.add_argument("-w", "--what_for", default='talk',
                         help="Format plot for either 'talk' or 'paper'.")
@@ -171,4 +173,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
     opt = vars(args)
 
-    plot_perm(args.infiles, 'output.png', args.data_type, args.what_for)
+    plot_perm(args.infiles, 'pka_2gbi.png', args.data_type, args.what_for)
